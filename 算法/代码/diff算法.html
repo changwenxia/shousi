@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>diff算法</title>
+</head>
+
+<body>
+  <!-- 真实的dom结构 -->
+  <div>
+    <p>123</p>
+  </div>
+
+  <script>
+    // 关于diff算法：先根据真是的DOM生成一个virtual dom（虚拟dom），当DOM中某个节点发生变化时，会生成一个新的vnode，去和oldvnode作比较，如果不同则真实DOM上的oldvnode会被替换vnode，diff的过程就是调用patch函数，一边比较新旧节点的变化，一边为真实的DOM打补丁。
+    // virtual dom和真实dom的区别在在；virtual dom 是将真实的dom，以对象的形式模拟（树形结构）出来 ，vNode和oldVNode都是对象。
+    // 虚拟dom结构
+    var vnode = {
+      tag: 'div',
+      children:{
+        tag: 'p',
+        text: '123'
+      }
+    }
+    
+    // 当数据发生变化时，set会调用Dep.notify,通知所有的订阅者Watcher,接下来订阅者就会调用patch给真实的dom打补丁，视图就会更新。
+    function patch (oldVNode,vNode){
+      if(sameVNode(oldVNode,vNode)){
+        patch(oldVNode,vNode);
+      }else{
+        const oEl = oldVNode.el;
+        let parentEle = api.parentNode(oEl);
+        createElement(vNode);
+        if (parentEle !== null){
+          api.insertBefore(parentEle.vnode.el,api.nextSibling(oEl))
+          api.removChuild(parent,oldVNode.el)
+          oldVNode = null;
+        }
+        return vNode;
+      }
+    }
+    // 判断两个节点的值是否值得比较，如果值得就执行patchvnode
+    function sameVNode(a,b){
+      a.key === b.key && //key值
+      a.tag===b.tag && //标签名
+      a.isComment === b.isComment && //是否注释
+      isDef(a.data) === isDef(b.data) && //是否都定义了data，data包含具体的信息，例如onclick，style 
+      sameInputType(a,b) //当前标签是<input>的时候，type必须相同 原因：input有很多种type，如button，CheckBox，password，submit，text
+    }
+    // 不值得比较则用Vnode替换oldVnode
+    // 如果两个节点都是一样的，那么就深入检查他们的子节点，如过两个节点不一样，那就说明Vnode完全被改变了，就可以直接替换oldVnode。虽然他这两个节点不一样但是他们的子节点一样怎们办？别忘了。diff可是逐层比较的，如果第一层不一样那么就不会继续深入比较第二层了。
+    // patchVnode 当我们确定两个值值得比较后，会对两个节点指定的patchvnode方法
+    function patchVnode (oldVNode,vnode) {
+      const el = vnode.el = oldVNode.le
+    }
+    console.log(patchVnode())
+  </script>
+</body>
+
+</html>
