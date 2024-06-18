@@ -1,4 +1,4 @@
-// 版本比较
+// 版本比较1
 const comparseVersion = (sv1, sv2) => {
     const [cur, tur] = [sv1.split('.'), sv2.split('.')];
     const maxL = Math.max(cur.length, tur.length);
