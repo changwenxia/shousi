@@ -10,6 +10,7 @@
 
       excutor(resolve, reject)
 
+      
       function resolve(value) {
         if (_this.state === "pending") {
           _this.value = value;
