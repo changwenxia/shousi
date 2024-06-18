@@ -1,15 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-
-<body>
-<script>
-  // 二叉搜索树满足一下几个性质：
+// 二叉搜索树满足一下几个性质：
     // 1，若任意节点的左子树不空，则左子树上所有节点的值均小于它的根节点的值；
     // 2，若任意节点的右子树不空，则右子树上所有节点的值均大于它的根节点的值；
     // 3，若任意节点的左、右子树也需要满足左边小右边大的性质
@@ -33,8 +22,3 @@
     }
   }
   // 定义两个指针，分别是p和tail，最初都指向root，p是用来指向要插入的位置的父节点的指针，而tail是用来查找插入位置的，所以最后它会指向null，举个例子，根据二叉树原理，当p指向了某个最后的节点，而tail最后指向了null（tail为null则说明已经找到了要插入的位置）。循环，tail根据我们上面分析的一步一步往下找位置插入，如果比当前节点小就往左找，大则往右找，一直到tail找到一个空位置也就是null。如果当前的root为null，则说明当前结构中并没有节点，所以插入的第一个节点直接为跟节点，即this.root = node将插入后的节点的parent指针指向父节点
-
-</script>
-</body>
-
-</html>

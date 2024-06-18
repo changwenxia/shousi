@@ -64,32 +64,8 @@
     // 直接器动任务队列  // 就会按照顺序执行三个对象中的 init 函数
     c.execute();
 
-    function setArr(m, n) {
-      //  return  new Array(m).fill(n);
-      const arr = [];
 
-      function add(m, n) {
-        if (arr.length === m) return arr;
-        arr.push(n);
-        add(m, n)
-      }
-      add(m, n);
-      return arr;
-    }
-    var arr = setArr(3, 2)
-    console.log(arr);
-   
-
-   var a;
-   var b=()=>{
-     console.log(a);
-     if(a!== null || typeof a!=="undefined"){
-       console.log("true");
-       return;
-     }
-     console.log("false");
-   }
-   b();
+ 
   </script>
 </body>
 

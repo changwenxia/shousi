@@ -1,3 +1,6 @@
+// 参考：
+// https://juejin.cn/post/6844903607968481287
+// https://juejin.cn/post/6844903629187448845#heading-3
 function MyPromise(executor) {
     let that = this;
     that.status = 'pending';
@@ -32,6 +35,145 @@ function MyPromise(executor) {
         reject(error);//promise失败了
     }
 }
+MyPromise.resolve = function(value) {
+    if (value instanceof MyPromise) {
+        return value; // 如果是Promise实例直接返回
+    }
+    return new Promise((resolve, reject) => resolve(value));
+}
+MyPromise.reject = reason => new Promise((resolve, reject) => reject(reason));
+
+MyPromise.all = function(promiseArr) {
+    return new MyPromise((resolve, reject)=> {
+        const length = promiseArr.length;
+        let result = [];
+        let count = 0;
+        if (length === 0) {
+            return resolve(result);
+        }
+        for (let [i, p] of promiseArr.entries()) {
+            MyPromise.resolve(p).then(
+                data => {
+                    result[i] = data;
+                    count++;
+                    if (count === length) {
+                        resolve(result);
+                    }
+                },
+                reason => reject(reason)
+            )
+        }
+    })
+};
+
+function PromiseAll(promise) {
+    return new Promise((resolve, reject) => {
+      let index= 0;
+      let result = []
+      if(promise.length === 0) {
+          resolve(result)
+      } else {
+         for (let i = 0; i < promise.length; i++) {
+             Promise.resolve(promise[i]).then(data=> {
+                result[i] = data
+                if(++index === promise.length){
+                   resolve(result)
+                }
+             }, err=> {
+                reject(err)
+             })
+         }
+      }
+     })
+  }
+
+function PromiseAll(promiseArr) {
+    return new Promise((resolve, reject) => {
+        let index = 0;
+        let res = [];
+        if (promiseArr.length === 0) {
+            resolve(res);
+        } else {
+            for (let [i, p] of promiseArr.entries()) {
+                Promise.resolve(p).then(data => {
+                        res[i] = data;
+                        if (++index === promiseArr.length) {
+                            resolve(res);
+                        }
+                    }, err => reject(err));
+            }
+        };
+    });
+};
+
+MyPromise.race = function(promiseArr) {
+    return new MyPromise((resolve, reject)=> {
+        const length = promiseArr.length;
+        if (length === 0) {
+            return resolve(result);
+        }
+        for (let item of promiseArr) {
+            MyPromise.resolve(item).then(
+                data => resolve(data),
+                reason => reject(reason)
+            )
+        }
+    })
+};
+
+
+MyPromise.any = function(promiseArr) {
+    return new MyPromise((resolve, reject)=> {
+        const length = promiseArr.length;
+        let result = [];
+        let count = 0;
+        if (length === 0) {
+            return resolve(result);
+        }
+        for (let [i, p] of promiseArr.entries()) {
+            MyPromise.resolve(p).then(
+                data => resolve(data),
+                reason => {
+                    result[i] = reason;
+                    count++;
+                    if (count === length) {
+                        reject(result);
+                    }
+                }
+            )
+        }
+    })
+};
+
+MyPromise.allSettled = function(promiseArr) {
+    return new MyPromise((resolve, reject)=> {
+        const length = promiseArr.length;
+        let result = [];
+        let count = 0;
+        if (length === 0) {
+            return resolve(result);
+        }
+        for (let [i, p] of promiseArr.entries()) {
+            MyPromise.resolve(p).then(
+                value => {
+                    result[i] = { status: "fulfilled", value: value };
+                    count++;
+                    if (count === length) {
+                        reject(result);
+                    }
+                },
+                reason => {
+                    result[i] = { status: "rejected", reason: reason };
+                    count++;
+                    if (count === length) {
+                        reject(result);
+                    }
+                }
+            )
+        }
+    })
+};
+
 MyPromise.prototype.then = function(onFulfilled, onRejected) {
     //防止值得穿透 
     onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : y => y;
@@ -134,32 +276,68 @@ function resolvePromise(promise2, x, resolve, reject) {
 }
 
 
-
-const p = new MyPromise((resolve, reject) => {
-    setTimeout(() => {
-      resolve(1)
-    }, 1000)
-  })
+// promise使用
+// const p = new MyPromise((resolve, reject) => {
+//     setTimeout(() => {
+//       resolve(1)
+//     }, 1000)
+//   })
   
-  p.then(res => {
-    console.log('first then', res)
-    return res + 1
-  }).then(res => {
-    console.log('first then', res)
-  })
+//   p.then(res => {
+//     console.log('first then', res)
+//     return res + 1
+//   }).then(res => {
+//     console.log('first then', res)
+//   })
   
-  p.then(res => {
-    console.log(`second then`, res)
-    return res + 1
-  }).then(res => {
-    console.log(`second then`, res)
-  })
+//   p.then(res => {
+//     console.log(`second then`, res)
+//     return res + 1
+//   }).then(res => {
+//     console.log(`second then`, res)
+//   })
   
   /**
    *  输出结果如下：
-   *  first then 1
-   *  first then 2
-   *  second then 1
-   *  second then 2
+   *    first then 1
+        second then 1
+        first then 2
+        second then 2
    */
-  
+
+//   all 使用
+    // let p1 = new MyPromise((resolve, reject) => {
+    //     resolve('成功了')
+    //   })
+        
+    //   let p2 = new MyPromise((resolve, reject) => {
+    //     resolve('success')
+    //   })
+        
+    // //   let p3 = MyPromise.reject('失败')
+        
+    //   MyPromise.all([p1, p2]).then((result) => {
+    //     console.log(result)               //['成功了', 'success']
+    //   }).catch((error) => {
+    //     console.log(error)
+    //   })
+
+    // race使用
+
+let p1 = new MyPromise((resolve, reject) => {
+    setTimeout(() => {
+      resolve('success')
+    },1000)
+  })
+   
+let p2 = new MyPromise((resolve, reject) => {
+    setTimeout(() => {
+      reject('failed')
+    }, 500)
+})
+   
+MyPromise.race([p1, p2]).then((result) => {
+    console.log(result)
+}).catch((error) => {
+    console.log(error)  // 打开的是 'failed'
+})
