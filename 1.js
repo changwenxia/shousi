@@ -11,6 +11,7 @@ const comparseVersion = (sv1, sv2) => {
     return res;
 }
 
+
 // comparseVersion('1.0', '1.1');
 
 // symbol独一无二的，即使值相同，也不相等(参考b和c)
