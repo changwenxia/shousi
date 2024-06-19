@@ -11,7 +11,6 @@ const comparseVersion = (sv1, sv2) => {
     return res;
 }
 
-
 // comparseVersion('1.0', '1.1');
 
 // symbol独一无二的，即使值相同，也不相等(参考b和c)
@@ -20,8 +19,6 @@ const comparseVersion = (sv1, sv2) => {
 // const [a, b, c, d, e, f] = [Symbol(), Symbol('con'), Symbol('con'), Symbol({age: 19}), Symbol.for('aa'), Symbol.for('aa')];
 // console.log(a,b,c, d, e, f);
 // console.log(b===c, e===f);
-
-
 
 const privateFiled = Symbol();
 class myClass {
