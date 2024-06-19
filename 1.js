@@ -14,7 +14,7 @@ const comparseVersion = (sv1, sv2) => {
 // comparseVersion('1.0', '1.1');
 
 // symbol独一无二的，即使值相同，也不相等(参考b和c)
-// 使用Symbol.for(key)可以创造两个相等的symbol变量，使用给定的key搜索现有的symbol，如果找到则返回该symbol。否则将使用给定的key在全局symbol注册表中创建一个新的symbol。
+// 使用Symbol.for(key)可以创造两个相等的symbol变量，使用给定的key搜索现有的symbol，如果找到则返回该symbol。否则将使用给定的key在全局symbol注册表中创建一个新的symbol。---
 
 // const [a, b, c, d, e, f] = [Symbol(), Symbol('con'), Symbol('con'), Symbol({age: 19}), Symbol.for('aa'), Symbol.for('aa')];
 // console.log(a,b,c, d, e, f);
