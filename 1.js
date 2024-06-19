@@ -35,7 +35,6 @@ class myClass {
 const aa = new myClass();
 // console.log(aa.getField());
 
-
 const  a = {
     value: [1,2,3],
     valueOf: function(){
