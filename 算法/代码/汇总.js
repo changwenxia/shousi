@@ -118,7 +118,7 @@ let tree = {
 }
 // 1.根左右 前序递归 1245367
 // function rootLR(tree) {
-//     console.log('-----', tree.id);
+//     console.log('====', tree.id);
 //     if (tree.left) rootLR(tree.left);
 //     if (tree.right) rootLR(tree.right);
 // }
@@ -126,7 +126,7 @@ let tree = {
 // 2.左根右 中序遍历 4251637
 // function LRootR(tree) {
 //     if (tree.left) LRootR(tree.left);
-//     console.log('-----', tree.id);
+//     console.log('====', tree.id);
 //     if (tree.right) LRootR(tree.right);
 // };
 // LRootR(tree);
@@ -169,5 +169,5 @@ function w_LRRoot(tree) {
     }
     return res.reverse();
 }
-w_LRRoot(tree)
+// w_LRRoot(tree)
 // console.log(w_LRRoot(tree));

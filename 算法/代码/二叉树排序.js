@@ -70,13 +70,12 @@ function w_LRootR(tree) {
 }
 // 6左右跟 后序非递归遍历 4526731
 function w_LRRoot(tree) {
-  let arr = [tree],
-    res = [];
-  while (arr.length) {
+  let arr = [tree], res = [];
+  while(arr.length) {
     let tmp = arr.pop();
     res.push(tmp.id);
-    if (tmp.left) arr.push(tmp.left)
-    if (tmp.right) arr.push(tmp.right)
+    if (tmp.left) arr.push(tmp.left);
+    if (tmp.right) arr.push(tmp.right);
   }
   return res.reverse();
 }
