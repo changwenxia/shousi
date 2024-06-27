@@ -1,4 +1,5 @@
 // 栈 先入后出  后入先出
+// 参考：https://www.jb51.net/article/255315.htm
 function createStack(data) {
   if (!Array.isArray(data)) return console.error("the params type needs to be Array");
   this.data = data;
@@ -42,11 +43,13 @@ function LRRoot(tree) {
 }
 // 4.根左右 前序非递归 1245367
 function w_rootR(tree) {
+  // 定义一个栈
   let res = [],
     arr = [tree]
   while (arr.length) {
     let tmp = arr.pop();
     res.push(tmp.id);
+    // 栈先入后出，所以需要先入右子树才能保证先出左子树
     if (tmp.right) arr.push(tmp.right)
     if (tmp.left) arr.push(tmp.left)
   }
@@ -65,6 +68,24 @@ function w_LRootR(tree) {
     let tmp = arr.pop();
     res.push(tmp.id);
     tree = tmp.right;
+  }
+  return res;
+}
+
+function w_LRootR(root) {
+  if (!root) return;
+  const stack = [],res = [];
+  let p = root; // 定义一个指针
+  // 如果指针有数据或者p不是null，则继续遍历
+  while(stack.length || p) {
+    // 如果p存在则将p入栈并移动指针
+    while (p) {
+      stack.push(p);
+      p = p.left;
+    }
+    const node = stack.pop();
+    res.push(node.id);
+    p = node.right;
   }
   return res;
 }

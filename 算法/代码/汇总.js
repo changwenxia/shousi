@@ -137,37 +137,164 @@ let tree = {
 //     console.log('-----', tree.id);
 // }
 // LRRoot(tree)
-// 4 根左右 前序非递归 4251637
-// function w_LRootR(tree) {
-//     let arr = [], res = [];
-//     while(true) {
-//         while(tree) {
-//             arr.push(tree);
-//             tree = tree.left;
+// 4 根左右 前序非递归 1245367
+// function w_rootR(tree) {
+//     // 定义一个栈
+//     let res = [],
+//       arr = [tree]
+//     while (arr.length) {
+//       let tmp = arr.pop();
+//       res.push(tmp.id);
+//       // 栈先入后出，所以需要先入右子树才能保证先出左子树
+//       if (tmp.right) arr.push(tmp.right)
+//       if (tmp.left) arr.push(tmp.left)
+//     }
+//     return res
+//   }
+//5 左根右 中序非递归 4251637
+// function w_LRootR(root) {
+//     if (!root) return;
+//     const stack = [],res = [];
+//     let p = root; // 定义一个指针
+//     // 如果指针有数据或者p不是null，则继续遍历
+//     while(stack.length || p) {
+//         // 如果p存在则将p入栈并移动指针
+//         while (p) {
+//             stack.push(p);
+//             p = p.left;
 //         }
-//         console.log(1, arr, res, tree);
-//         if (!arr.length) break;
-//         let tmp = arr.pop();
-//         res.push(tmp.id);
-//         tree = tmp.right;
-//         console.log(2, arr, res, tree);
-
+//         const node = stack.pop();
+//         res.push(node.id);
+//         p = node.right;
 //     }
 //     return res;
 // }
-// console.log(w_LRootR(tree)); 
 // 6 左右跟 后序非递归遍历 4526731
-function w_LRRoot(tree) {
-    let arr = [tree], res = [];
-    while(arr.length) {
-        let tmp = arr.pop();
-        res.push(tmp.id);
-        console.log(1, arr, tmp, res);
+// function w_LRRoot(tree) {
+//     let arr = [tree], res = [];
+//     while(arr.length) {
+//         let tmp = arr.pop();
+//         res.push(tmp.id);
+//         console.log(1, arr, tmp, res);
 
-        if (tmp.left) arr.push(tmp.left); 
-        if (tmp.right) arr.push(tmp.right); 
+//         if (tmp.left) arr.push(tmp.left); 
+//         if (tmp.right) arr.push(tmp.right); 
+//     }
+//     return res.reverse();
+// }
+
+function w_LRRoot(root) {
+    if (!root) return;
+    const res = [], outputStack = [];
+    const stack = [root];
+    while(stack.length) {
+        const node = stack.pop();
+        outputStack.push(node);
+        // 这里先入left需保证left后出，在stack中后出，就是在outputStack中先出
+        node.left && stack.push(node.left);
+        node.right && stack.push(node.right);
     }
-    return res.reverse();
+    while (outputStack.length) {
+        const node = outputStack.pop();
+        res.push(node.id);
+    }
+    return res;
 }
 // w_LRRoot(tree)
 // console.log(w_LRRoot(tree));
+
+// const tree ={
+//     value: 'a',
+//     children: [
+//         {
+//             value: 'b',
+//             children: [
+//                 {value: 'e', children: null},
+//                 {value: 'f', children: null},
+//             ]
+//         },
+//         {
+//             value: 'c',
+//             children: [
+//                 {value: 'g', children: null},
+//             ]
+//         },
+//         {
+//             value: 'd',
+//             children: [
+//                 {value: 'h', children: null},
+//                 {value: 'i', children: null},
+//             ]
+//         },
+//     ],
+// };
+// let arr = [];
+
+// const dfs = (root) => {
+//     arr.push(root.value)
+//     root.children && root.children.forEach(dfs);
+// }
+
+// const bfs = root => {
+//     const q = [root];
+//     while(q.length > 0) {
+//         const node = q.shift();
+//         arr.push(node.value);
+//         node.children && node.children.forEach(child => q.push(child))
+//     }
+// }
+// bfs(tree)
+// console.log(arr);
+
+// let tree = {
+//     val: 'a',
+//     left: {
+//         val: 'b',
+//         left: {val: 'd'},
+//         right: {val: 'e'},
+//     },
+//     right: {
+//         val: 'c',
+//         left: {
+//             val: 'f',
+//             left: {val: 'h'},
+//             right: {val: 'i'},
+//         },
+//         right: {val: 'g'},
+//     }
+// }
+// console.log(w_LRootR(tree)); 
+// let arr = [];
+// 二叉树的深度优先遍历与树的深度优先遍历思路一致，思路如下：
+// 访问根节点；
+// 访问根节点的left
+// 访问根节点的right
+// 重复执行第二三步
+const dfs = root => {
+    if (!root) return;
+    arr.push(root.val);
+    root.left && dfs(root.left);
+    root.right && dfs(root.right);
+}
+
+// 广度优先遍历
+// 实现思路如下：
+
+// 创建队列，把根节点入队
+// 把对头出队并访问
+// 把队头的left和right依次入队
+// 重复执行2、3步，直到队列为空
+const bfs = root => {
+    if (!root) return;
+    const queue = [root];
+    while(queue.length) {
+        let node = queue.shift();
+        arr.push(node.val);
+        node.left && queue.push(node.left);
+        node.right && queue.push(node.right);
+    }
+}
+// bfs(tree);
+// console.log(arr);
+// const root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 4;
+// console.log(lowestCommonAncestor(root, p, q))

@@ -1,24 +1,71 @@
-// 二叉搜索树满足一下几个性质：
+// 二叉搜索树
+// 参考：https://blog.csdn.net/qq_15509251/article/details/131652868
+// 满足一下几个性质：
     // 1，若任意节点的左子树不空，则左子树上所有节点的值均小于它的根节点的值；
     // 2，若任意节点的右子树不空，则右子树上所有节点的值均大于它的根节点的值；
     // 3，若任意节点的左、右子树也需要满足左边小右边大的性质
   // 二叉树搜索树的链式存储结构 二叉搜索树的节点通常包含四个域，数据元素，分别指向左、右节点的指针和一个指向父节点的指针，一般把这种存储结构成为三叉链表。
   // 代码初始化一个二叉搜索树的节点：
-  class BinaryTreeNode {
-    constructor(key,value){
-      this.parent = null; //指向父节点的指针
-      this.left = null; //指向左节点的指针
-      this.right = null; //指向右节点的指针
-      this.value = value; //一个数据元素，可以是一个key和value
+
+  // 向二叉搜索树中插入数据
+  // 向一个二叉搜索树插入数据实现思路如下：
+  
+  // 判断root是否为空，如果为空则创建root；
+  // 如果root非空，则需要判断插入节点的val比根节点的val是大还是小；
+  // 如果比根节点小，说明是左子树的节点；
+  // 如果比根节点大，说明是右子树的节点；
+  // 上面两步重复执行，直到找到一个点，如果这个点小于我们要插入的值，且不存在右子树，将这个点作为其右叶子节点；如果这个点大于我们要插入的值，且不存在右子树，将这个点作为其左叶子节点。
+class BinarySearchTree {
+  constructor() {
+    // 初始化根节点
+    this.root = null
+  }
+  // 创建一个节点
+  Node(val) {
+    return {
+      left: null, // 左子树
+      right: null, // 右子树
+      parent: null, // 父节点
+      val,
     }
   }
-  // 代码初始化一个二叉搜索树：
-  class BinarySearchTree{
-    constructor(){
-      this.root = null;
+
+  insertNode(val) {
+    const that = this;
+    // 允许接收一个数组，批量插入
+    if (Object.prototype.toString.call(val) === "[obejct Array]") {
+      val.forEach(v => that.insertNode(v));
+      return;
     }
-    static createNode(key,value){
-      return new BinarySearchTree(key,value);
+
+    if (typeof val !== 'number') throw newError('不是一个数字');
+    const newNode = this.node(val);
+    if (this.root) {
+      // 根节点非空
+      this.#insertNode(this.root, newNode);
+    } else {
+      // 根节点是空的，直接创建
+      this.root = newNode;
     }
   }
-  // 定义两个指针，分别是p和tail，最初都指向root，p是用来指向要插入的位置的父节点的指针，而tail是用来查找插入位置的，所以最后它会指向null，举个例子，根据二叉树原理，当p指向了某个最后的节点，而tail最后指向了null（tail为null则说明已经找到了要插入的位置）。循环，tail根据我们上面分析的一步一步往下找位置插入，如果比当前节点小就往左找，大则往右找，一直到tail找到一个空位置也就是null。如果当前的root为null，则说明当前结构中并没有节点，所以插入的第一个节点直接为跟节点，即this.root = node将插入后的节点的parent指针指向父节点
+  // 私有方法，插入节点
+  #insertNode(root, newNode) {
+    // 新节点比根节点小，左子树
+    if (newNode.val < root.val) {
+      if (root.left === null) {
+        root.left = newNode;
+        root.left.parent = root;
+      } else {
+        this.#insertNode(root.left, newNode);
+      }
+    } else {
+      // 新节点比根节点大，右子树
+      if (root.right === null) {
+        root.right = newNode;
+        root.right.parent = root;
+      } else {
+        this.#insertNode(root.right, newNode);
+      }
+    }
+  }
+};
