@@ -8,6 +8,8 @@ function findLongestWord(str) {
   }
   return Math.max(...arr)
 }
+
+console.log(findLongestWord("The quick brown fox jumped over the lazy dog"));
 // 找出数组中最大的数
 function findLargestOfArr(arr) {
   let newArr = [];

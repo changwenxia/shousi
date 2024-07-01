@@ -68,4 +68,28 @@ class BinarySearchTree {
       }
     }
   }
+/**
+ * 递归 根据 val 查找节点
+ * @param {number} val 需要查找的数值
+ * @returns 如果找到返回当前节点的引用，如果未找到返回 undefined
+ */
+  find(val) {
+    if(typeof val !== 'number') throw  newError('不是一个数字');
+    let node = this.root;
+    while(node) {
+      if (node.val < val) {
+        node = node.right;
+      } else if(node.val > val) {
+        node = node.left;
+      } else {
+        return node;
+      }
+    }
+    return;
+  }
 };
+
+const tree = new BinarySearchTree()
+tree.insertNode([71, 35, 87, 22, 53, 46, 66, 78, 98])
+const arr = BinarySearchTree.inorder(tree.root)
+console.log(arr) // [ 22, 35, 46, 53, 66,71, 78, 87, 98 ]

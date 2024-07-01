@@ -30,10 +30,19 @@ b();
 //切记，插入到字符串尾部的三个点号也会计入字符串的长度。
 // 但是，如果指定的参数num小于或等于3，则添加的三个点号不会计入字符串的长度。
 function truncate(str, num) {
-  if (str.length > num) {
-    const length = str.length - num >= 30 ? num - str.length - 3 : num - str.length;
-    return str.slice(0, length) + "...";
+  // 写法1
+  // if (str.length > num) {
+  //   const length = str.length - num >= 30 ? num - str.length - 3 : num - str.length;
+  //   return str.slice(0, length) + "...";
+  // }
+  // 写法2
+  var result='';
+  if (str.length<=num) {
+    result=str;
+  } else {
+    result= num > 3 ? str.slice(0, num-3) + '...' : str.slice(0, num)+'...';
   }
+  return result;
 }
 // truncate("A-tisket a-tasket A green and yellow basket", 11);
 // 猴子吃香蕉可是掰成好几段来吃哦！
@@ -102,24 +111,33 @@ function where(arr, num) {
 
 // 写一个ROT13函数，实现输入加密字符串，输出解密字符串。
 // 所有的字母都大写，不要转化任何非字母形式的字符(例如：空格，标点符号)，遇到这些特殊字符，跳过它们。
+// 1、26个字母的unicode码在65(A)与90(Z)之间,第13位M(77);
+// 2、将str通过.charCodeAt()转为unicode编码并放入新数组;
+//   其中非字母形式的字符直接放入.charAt();
+//   后13位字母减去13后放入；
+//   前13位字母加上13后放入；
+//   通过.fromCharCode()转化为字母，将数组转化为字符串；
 // rot13("SERR PBQR PNZC") 应该解码为 "FREE CODE CAMP"
 // rot13("SERR CVMMN!") 应该解码为 "FREE PIZZA!"
 // rot13("SERR YBIR?") 应该解码为 "FREE LOVE?"
 // rot13("GUR DHVPX OEBJA QBT WHZCRQ BIRE GUR YNML SBK.") 应该解码为 "THE QUICK BROWN DOG JUMPED OVER THE LAZY FOX."
 function rot13(str) {
-  let arr = str.toUpperCase().split(" "),
-    res = [];
-  for (let i = 0; i < arr.length; i++) {
-    const arr1 = arr[i].split("");
-    for (let j = 0; j < arr1.length; j++) {
-      let num = arr1[j].charCodeAt();
-      if (num >= 65 && num <= 90) {
-        arr1[j] = num + 13 > 90 ? String.fromCharCode(64 + (num + 13 - 90)) : String.fromCharCode(num + 13);
-      }
+    //定义一个数组，用来存放解密后的字符
+    var newArr = [];
+    //遍历参数字符串
+    for (var i = 0; i < str.length; i++) {
+        // 非字母形式的字符，直接跳过，存入数组newArr中
+        if (str.charCodeAt(i) < 65 || str.charCodeAt(i) > 90) {
+            newArr.push(str.charAt(i));
+        } else if (str.charCodeAt(i) > 77) {
+            // 后13个大写字母，减去13
+            newArr.push(String.fromCharCode(str.charCodeAt(i) - 13));
+        } else {
+            // 前13个大写字母，加上13 
+            newArr.push(String.fromCharCode(str.charCodeAt(i) + 13));
+        }
     }
-    res.push(arr1.join(""))
-  }
-  return res.join(" ")
+    return newArr.join("");
 }
 
 // 已知如下数组：

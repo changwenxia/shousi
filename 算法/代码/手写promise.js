@@ -1,6 +1,6 @@
 
     // js实现promise
-    function Promise(excutor) {
+    function SimplePromise(excutor) {
       let _this = this;
       this.state = "pending";
       this.value = null;
@@ -27,8 +27,8 @@
         }
       }
     }
-    Promise.prototype.then = function (onFulfilled, onRejected) {
-      var promise2 = new Promise((resolve, reject) => {
+    SimplePromise.prototype.then = function (onFulfilled, onRejected) {
+      var promise2 = new SimplePromise((resolve, reject) => {
         if (this.state === "resolved") {
           onFulfilled(this.value);
         }
@@ -83,11 +83,25 @@
     // 测试promise是否通过
     Promise.defer = Promise.deferred = function () {
       let dfd = {}
-      dfd.promise = new Promise((resolve, reject) => {
+      dfd.promise = new SimplePromise((resolve, reject) => {
         dfd.resolve = resolve;
         dfd.reject = reject;
       });
       return dfd;
     }
-    
-    module.exports = Promise;
+     // 使用示例
+  const myPromise = new SimplePromise((resolve, reject) => {
+    // 异步操作
+    setTimeout(() => {
+      // 成功时调用resolve
+      resolve('操作成功');
+   
+      // 失败时调用reject
+      // reject('操作失败');
+    }, 1000);
+  });
+   
+  myPromise.then(
+    (value) => console.log('成功:', value),
+    (reason) => console.error('失败:', reason)
+  );
