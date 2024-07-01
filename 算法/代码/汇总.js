@@ -1187,11 +1187,43 @@ function repeat(str, num) {
   // 1， 乱码只有两种特殊字符分别是 '?' 和 ' ';
   // 2， 如果乱码的末尾是 '?'  则它的下一位字母肯定是大写；
 function regStr(str) {
-    let strArr = str.split('?');
-    strArr.forEach((val, key) => {
-        strArr[key] = strArr[key].charAt(0).toUpperCase() + strArr[key].slice(1);
+    let resArr = str.split('?');
+    resArr.forEach((val, key) => {
+        resArr[key] = resArr[key].charAt(0).toUpperCase() + resArr[key].slice(1);
     })
-    strArr = strArr.join('').replace(/\?/g, '');
-    console.log(strArr);
+    resArr = resArr.join('').replace(/\?/g, '');
+    console.log(resArr);
 }
-regStr('I? love ?? the ?great ? ?wall in ?beijing');
+// regStr('I? love ?? the ?great ? ?wall in ?beijing');
+
+// 统计一个字符串出现最多的字母
+  // 输入 ： afjghdfraaaasdenas
+  // 输出 ： a
+  // 思路：1. 得到每个字符出现的次数：遍历字符串，如果新对象里没有字符，将新对象的对应字符值=1；有的话+1；  
+  // 2.查找新对象中出现次数最多的字符:遍历新对象，如果新对象中字符出现次数大于前一个字符的话，将此字符赋给maxChar，值赋给新maxValue，一此循环，找到出现最多的字符
+  function getMaxAndIndex(str) {
+    if(!str.length) return;
+    if (str.length === 1) return 1;
+    let h ={},maxNum = 0,maxStr = '';
+    for (let i = 0; i < str.length; i++) {
+        let a = str[i];
+        h[a] === undefined ? h[a]=1 : h[a]++
+        if(h[a] > maxNum) {
+            maxNum = h[a]
+            maxStr = a
+        }
+    }
+    return [maxStr, maxNum];
+  }
+//   console.log(getMaxAndIndex('afjghdfraaaasdenas'));
+
+  // 字符串每个单词首字母大写，其他小写
+  function titleCase(str) {
+    str = str.split(' ');
+    for(let i=0;i<str.length;i++) {
+        str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1).toLowerCase();
+    }
+    console.log(str.join(' '));
+  }
+
+  titleCase('asd ffd dff ww ADFF ddfSF');
