@@ -53,9 +53,10 @@
     // 如果两个节点都是一样的，那么就深入检查他们的子节点，如过两个节点不一样，那就说明Vnode完全被改变了，就可以直接替换oldVnode。虽然他这两个节点不一样但是他们的子节点一样怎们办？别忘了。diff可是逐层比较的，如果第一层不一样那么就不会继续深入比较第二层了。
     // patchVnode 当我们确定两个值值得比较后，会对两个节点指定的patchvnode方法
     function patchVnode (oldVNode,vnode) {
-      const el = vnode.el = oldVNode.le
+      const el = vnode.el = oldVNode.el
     }
-    console.log(patchVnode())
+    let node = document.querySelector('p').innerHTML;
+    console.log(patchVnode(node, vnode))
   </script>
 </body>
 

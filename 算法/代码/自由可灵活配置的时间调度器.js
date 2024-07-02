@@ -26,20 +26,20 @@
       }
     }
   }
-  let a = () => {
-    console.log("a");
-  }
-  let b = () => {
-    console.log("b");
-  }
-  let c = () => {
-    console.log("c");
-  }
-  let d = () => {
-    console.log("d");
-  }
+  // let a = () => {
+  //   console.log("a");
+  // }
+  // let b = () => {
+  //   console.log("b");
+  // }
+  // let c = () => {
+  //   console.log("c");
+  // }
+  // let d = () => {
+  //   console.log("d");
+  // }
   //1，可以为5秒后调用a,3秒后调用b，10秒后调用。c...z方法不执行（不执行的方法可以设计成不传递参数），那么在第14秒的时候开始重新从0秒循环，又变成第一秒后调用a,3秒后调用b，这样循环往复；
-  const timeScheduler1 = new TimeScheduler();
+  // const timeScheduler1 = new TimeScheduler();
   // timeScheduler1.add(a, 5);
   // timeScheduler1.add(b, 3);
   // timeScheduler1.add(c, 10);
@@ -47,40 +47,49 @@
   // timeScheduler1.add(b,4);
   // timeScheduler1.add(a,6);
   // 3，第一秒先执行a，3秒后执行b，但是c却是每间隔3秒执行一次，d是每间隔4秒执行一次，a和b是每4秒进行一次循环；
-  timeScheduler1.add(a, 1);
-  timeScheduler1.add(b, 3);
-  timeScheduler1.add(c, 3);
-  timeScheduler1.add(d, 4);
+  // timeScheduler1.add(a, 1);
+  // timeScheduler1.add(b, 3);
+  // timeScheduler1.add(c, 3);
+  // timeScheduler1.add(d, 4);
   // 4，a不执行，b和c每间隔3秒执行一次，d不执行；
   // timeScheduler1.add(b,3);
   // timeScheduler1.add(c,3);
 
-  timeScheduler1.next();
-
+  // timeScheduler1.next();
+  function work() {}
+  
 
   function DayLife() {
-    let funcs = [];
-    this.dothing = function(fn,time ){
+    this.funcs = [];
+    this.dothing = function(fn,time){
       const func = ()=>{
         setTimeout(()=>{
-          const fns = this.funcs.shift();
-          fns&& fns();
+          fn();
+          this.next();
         },(time-8)*1000)
       }
-      this.funcs.push(func)
+      this.funcs.push({func})
     }
-
+    this.next = function () {
+      let obj = this.funcs.shift() || {};
+      if (obj.func) {
+        this.funcs.push(obj);
+        obj.func();
+      }
+    }
   }
   const a = ()=> { console.log("起床");}
   const b = ()=> { console.log("刷牙");}
   const c = ()=> { console.log("上班");}
-  const d = ()=> { console.log("睡觉");}
+  const d = ()=> { console.log("下班");}
+  const e = ()=> { console.log("睡觉");}
   const dayLife = new DayLife();
   async function thing(){
     dayLife.dothing(a, 8);
     dayLife.dothing(b, 9);
     dayLife.dothing(c, 10);
-    await work();
-    dayLife.dothing(d, 22);
+    dayLife.dothing(d, 17);
+    dayLife.dothing(e, 22);
+    dayLife.next();
   }
   thing()

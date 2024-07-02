@@ -1226,4 +1226,476 @@ function regStr(str) {
     console.log(str.join(' '));
   }
 
-  titleCase('asd ffd dff ww ADFF ddfSF');
+//   titleCase('asd ffd dff ww ADFF ddfSF');
+
+// 自由可灵活配置的时间调度器，
+// 有a, b, c, d...很多个需要被调度的方法（ 方法名称的命名可随意）， 调度有两种形式， 一个是顺序调用（ 例如调度完a后才能调度b）， 一个是间隔某个时间进行循环调度。 用一个统一的方法进行封装可以实现下列的例子：
+// 1， 可以为5秒后调用a, 3 秒后调用b， 10 秒后调用。 c...z方法不执行（ 不执行的方法可以设计成不传递参数）， 那么在第14秒的时候开始重新从0秒循环， 又变成第一秒后调用a, 3 秒后调用b， 这样循环往复；
+// 2， 每间隔6秒调用一次a, 每间隔4秒调用一次b， c...z方法不执行；
+// 3， 第一秒先执行a， 3 秒后执行b， 但是c却是每间隔3秒执行一次， d是每间隔4秒执行一次， a和b是每4秒进行一次循环；
+// 4， a不执行， b和c每间隔3秒执行一次， d不执行；
+// https: //ideone.com/ 答题的同学答案都写到这个网站 写完了点一下 run就行，然后把url复制了发给我们便可。
+function TimeScheduler() {
+    this.funcCallBack = [];
+    this.add = function (fn, time) {
+      let func = () => {
+        setTimeout(() => {
+          fn();
+          this.next();
+        }, time * 1000)
+      }
+      this.funcCallBack.push({
+        func
+      })
+    }
+    this.next = function () {
+      let obj = this.funcCallBack.shift() || {};
+      if (obj.func) {
+        this.funcCallBack.push(obj);
+        obj.func();
+      }
+    }
+}
+// let a1 = () => {
+//     console.log("a");
+//   }
+//   let b1 = () => {
+//     console.log("b");
+//   }
+//   let c1 = () => {
+//     console.log("c");
+//   }
+//   let d1 = () => {
+//     console.log("d");
+//   }
+  //1，可以为5秒后调用a,3秒后调用b，10秒后调用。c...z方法不执行（不执行的方法可以设计成不传递参数），那么在第14秒的时候开始重新从0秒循环，又变成第一秒后调用a,3秒后调用b，这样循环往复；
+//   const timeScheduler1 = new TimeScheduler();
+//   timeScheduler1.add(a1, 5);
+//   timeScheduler1.add(b1, 3);
+//   timeScheduler1.add(c1, 10);
+  // 2，每间隔6秒调用一次a,每间隔4秒调用一次b，c...z方法不执行；
+//   timeScheduler1.add(b1,4);
+//   timeScheduler1.add(a1,6);
+  // 3，第一秒先执行a，3秒后执行b，但是c却是每间隔3秒执行一次，d是每间隔4秒执行一次，a和b是每4秒进行一次循环；
+//   timeScheduler1.add(a1,1);
+//   timeScheduler1.add(b1,3);
+//   timeScheduler1.add(c1,3);
+//   timeScheduler1.add(d1,4);
+    // 4，a不执行，b和c每间隔3秒执行一次，d不执行；
+// timeScheduler1.add(b1,3);
+// timeScheduler1.add(c1,3);
+//   timeScheduler1.next();
+function DayLife() {
+    this.funcs = [];
+    this.dothing = function(fn, time) {
+        const func = () => {
+            setTimeout(() => {
+                fn();
+                this.next();
+            }, (time - 8) * 1000)
+        }
+        this.funcs.push({func});
+    }
+    this.next = function() {
+        let obj = this.funcs.shift() || {};
+        if (obj.func) {
+            this.funcs.push(obj);
+            obj.func();
+        }
+    }
+}
+const a1 = ()=> { console.log("起床");}
+const b1 = ()=> { console.log("刷牙");}
+const c = ()=> { console.log("上班");}
+const d = ()=> { console.log("下班");}
+const e = ()=> { console.log("睡觉");}
+const dayLife = new DayLife();
+async function thing(){
+  dayLife.dothing(a1, 8);
+  dayLife.dothing(b1, 9);
+  dayLife.dothing(c, 10);
+  dayLife.dothing(d, 17);
+  dayLife.dothing(e, 22);
+  dayLife.next();
+}
+// thing()
+
+//数组合并去重
+let arr1 = [1,8,9,4,5,12]
+let arr2 = [2,3,10,11,6,13,14,15,16,17,18,19,20]
+let arrconcat = [];
+// console.log(arrconcat.concat(arr1, arr2).sort((a, b) => a-b));
+function flat(arr) {
+    let res = [];
+    for (let i = 0; i < arr.length; i++) {
+        if (Array.isArray(arr[i])) {
+            res = res.concat(flat(arr[i]));
+        } else {
+            res.push(arr[i]);
+        }
+    }
+    return res;
+}
+// console.log(flat([1, [4, 5, [6, 7]]]));
+
+
+// -------------------diff算法-------------------
+// 关于diff算法：
+// 先根据真实的dom生成一个virtual dom(虚拟dom)，当dom中的某个节点发生变化时会生成一个新的vnode，去和oldvnode做比较，如果不同则真实的dom上的vnode会被替换vnode，diff的过程就是调用patch函数，一边比较新旧节点的变化，一边为真实的dom打补丁。
+// virtual dom和真实dom的区别在于:virtual dom是将真实的dom，以对象的形式模拟(树形结构)出来，vnode和oldvnode都是对象。
+// 真实dom:
+// <div>
+//    <p>123</p>
+//</div>
+// 虚拟dom结构：
+let vnode = {
+    tag: 'div',
+    children: {
+        tag: 'p',
+        text: '123'
+    }
+}
+// 当数据发生变化时，set会调用Dep.notify，通知所有的订阅者watcher，接下来订阅者就会调用patch给真实dom打补丁，触发视图更新
+function patch(oldVNode, vNode) {
+    if (sameVNode(oldVNode, vNode)) {
+        patch(oldVNode, vNode);
+    } else {
+        const oEl = oldVNode.el;
+        let parentEle = api.parentNode(oEl);
+        createElement(vNode);
+        if (parentEle !== null) {
+            api.insertBefore(parentEle.vnode.el, api.nextSibing(oEl));
+            api.removeChild(parent, oldVNode.el);
+            oldVNode = null;
+        }
+        return oldVNode;
+    }
+}
+// 判断两个节点的值是否值得比较，如果值得比较就执行patchvnode
+function sameVNode(a, b) {
+    a.key === b.key && //key值
+    a.tag === b.tag && // 标签名
+    a.isComment === b.isComment && // 是否注释
+    isDef(a.data) === isDef(b.data) && // 是否都定义了data，data包含具体的信息，如onclick,style
+    sameInputType(a, b) // 当前标签<input>的时候，type必须相同，原因：input有很多种type，如button，CheckBox，password，submit，text
+}
+
+// 不值得比较就用vnode替换oldVnode
+// 如果两个节点都是一样的，那么就深入检查他们的子节点，如果两个节点不一样，那就说明vnode完全被改变了，可以直接替换oldvnode。虽然他这两个节点不一样但是子节点一样怎么办，别忘了，diff是逐层比较的，如果第一层不一样那么就不会继续深入比较第二层了。
+// pathVnode 当我们确定两个值值得比较后，会对两个节点指定的pathvnode方法
+function pathVnode(oldVNode, vnode) {
+    const el = vnode.el = oldVNode.el;
+}
+// console.log(patchVnode(node, vnode))
+
+//-------------继承
+// 1.原型链继承
+// 缺点：1.所有新实例都会共享父类实例的属性。（原型上的属性是共享的，一个实例修改了原型属性，另一个实例的原型属性也会被修改！）2.无法在不影响所有实例对象的情况下，给父类的构造函数传递参数。
+// function Parent(name, gender) {
+//     this.name = name;
+//     this.gender = gender;
+//     this.list = [1,2,3];
+// }
+// Parent.prototype.eat = function() {
+//     console.log('晚餐时间到');
+// }
+// function Child(age) {
+//     this.age = age;
+// }
+
+// Child.prototype = new Parent('李白', '男');
+// let child = new Child(10);
+// let child2 = new Child(20);
+// child.eat();
+// console.log(child.list, child2.list);
+// child.list.push(4);
+// console.log(child.list, child2.list);
+// 2构造函数继承，只能继承属性，不能继承方法
+// function Parent(name) {
+//     this.name = name;
+// }
+// Parent.prototype.sayHi = function() {console.log('hello');}
+// function Child(name, age, sex) {
+//     Parent.call(this, name);
+//     this.age = age;
+//     this.sex = sex;
+// }
+// let child = new Child('aa', 18, '女');
+// console.log(child.name);
+// child.sayHi();//  Uncaught TypeError:child.sayHi is not a function
+
+// 3组合继承
+function Parent() {
+    this.name = 'aa';
+    this.age = 20;
+    this.list = [1,2,3];
+}
+Parent.prototype.sayHi = function() {console.log('hello');}
+function Child() {
+    Parent.call(this);
+    this.address = '北京';
+}
+Child.prototype = Object.create(Parent.prototype);
+Child.prototype.constructor = Child;
+
+let s1 = new Child();
+let s2 = new Child();
+// s1.sayHi();
+// console.log(s1.name);
+// console.log(Child.prototype.constructor); //Child
+// console.log(s2.constructor); //Child
+// es6 extends super继承
+class Animal {
+    constructor(props) {
+        this.name = props.name ||'unknown';
+    }
+    eat() {
+        console.log(this.name);
+    }
+} 
+class Bird extends Animal {
+    constructor(props, myAttribute) {
+        super(props);
+        this.type = props.type || 'unknown';
+        this.attr = myAttribute;
+    }
+    fly() {
+        console.log(this.name);
+    }
+    myattr() {
+        console.log(this.type + '-------' + this.attr);
+    }
+}
+
+let myBird = new Bird(
+    {
+        name: '',
+        type: 'Egg animal'
+    },
+    'Bird class'
+)
+// myBird.eat();
+// myBird.fly();
+// myBird.myattr();
+
+
+// --------------------- js设计模式 ---------------------
+// 单例模式
+function Person() {}
+function singleton() {
+    let instance;
+    if (!instance) instance = new Person();
+    return instance;// 返回永远都是第一次new Person的示例，永远是一个示例
+}
+// const p1= singleton();
+// const p2= singleton();
+// console.log(p1===p2); // false
+// 组合模式
+class A {
+    init() {console.log('aa')};
+}
+class B {
+    init() {console.log('bb')};
+}
+class C {
+    init() {console.log('cc')};
+}
+//上面实例化对象的启动方式都一致,把这几个函数以组合模式的情况书写然后统一启动
+class Compose {
+    constructor() {
+        this.compose = [];
+    }
+    add(task) { // 添加任务的方法
+        this.compose.push(task);
+    }
+    execute() {  // 一个执行任务的方法
+        this.compose.forEach(item => item.init());
+    }
+}
+// const c1 = new Compose();
+// // 把所有要完成的任务都放在队列里面
+// c1.add(new A());
+// c1.add(new B());
+// c1.add(new C());
+// // 直接器动任务队列  // 就会按照顺序执行三个对象中的 init 函数
+// c1.execute();
+
+// LazyMan类
+// 实现一个LazyMan，可以按照以下方式调用：
+// LazyMan('Hank')， 输出：Hi, This is Hank!
+// LazyMan('Hank').sleep(5).eat('dinner')， 输出：
+// Hi, This is Hank!
+// 等待5秒
+// Weak up after 10; Eat dinner~
+// LazyMan('Hank').eat('dinner').eat('supper')， 输出:
+//Hi, this is Hank!
+//Eat dinner~
+//Eat supper~
+//LazyMan('Hank').sleepFirst(5).eat('supper')， 输出
+// 等待5秒
+// Wake up after 5
+// Hi, this is Hank!
+// Eat supper
+
+//以此类推
+// 题目解析
+// 需要封装一个对象，并且这个对象提供不同的方法，比如eat
+// 能进行链式调用，那么每个调用方法，都必须返回当前对象
+// sleep、sleepFirst方法需要时异步的
+// 解题思路
+// 采用 ES6 的 class，来实现，封装对象_LazyMan
+// 提供一系列方法，比如eat。sleep、sleepFirst异步方法采用Promise和setTimeout实现
+// 链式调用，考虑到其中含异步方法，采用任务队列及 ES6 的async wait实现。每次调用都往队列中加入方法，然后循环调用任务队列，而循环中通过异步实现异步的方法，保证正确。
+class lazyMan {
+    constructor(name) {
+        this.taskQueue = [];
+        this.timer = null;
+        this.sayHi(name);
+    }
+    run() {
+        if (this.timer) {
+            clearTimeout(this.timer);
+        }
+        this.timer = setTimeout(async() => {
+            for(let func of this.taskQueue) {
+                await func();
+            }
+            this.taskQueue = [];
+            this.timer = null;
+        })
+        return this;
+    }
+    sayHi(name) {
+        this.taskQueue.push(async () => {
+            console.log(`hi i am ${name}`);
+        })
+        return this.run();
+    }
+    eat(food) {
+        this.taskQueue.push(async () => {
+            console.log(`eat ${food}`);
+        })
+        return this.run();
+    }
+    sleep(second) {
+        this.taskQueue.push(async () => {
+            console.log(`sleep ${second}s`);
+            return this._timeout(second);
+        })
+        return this.run();
+    }
+    sleepFirst(second) {
+        this.taskQueue.unshift(async () => {
+            console.log(`sleep first ${second}s`);
+            return this._timeout(second);
+        })
+        return this.run();
+    }
+    _timeout(second) {
+        return new Promise(resolve => setTimeout(resolve, second*1000));
+    }
+}
+
+let LazyMan = (name) => new lazyMan(name);
+// LazyMan('Hank');
+// LazyMan('Hank').sleep(5).eat('dinner');
+// LazyMan('Hank').eat('dinner').eat('supper');
+// LazyMan("Hank").sleepFirst(5).eat("supper");
+
+// -------------vue的observer-------------
+function observer(obj) {
+    if (!obj || typeof obj !== 'object') return;
+    Object.keys(obj).forEach(key => defineReactive(obj, key, obj[key]));
+    return obj;
+}
+
+function defineReactive(obj, key, val) {
+    let dep = new Dep();
+    Object.defineProperty(obj, key, {
+        get() {
+            dep.depend();
+            console.log(`${key}属性被读取了`);
+            return val;
+        },
+        set(newVal) {
+            console.log(`${key}属性被改了`);
+            val = newVal;
+            dep.notify();
+        }
+    })
+}
+class Dep {
+    constructor(){
+        this.subs = []
+    }
+    //增加订阅者
+    addSub(sub){
+        this.subs.push(sub);
+    }
+    //判断是否增加订阅者
+    depend() {
+        if (Dep.target) {
+            this.addSub(Dep.target)
+        }
+    }
+    //通知订阅者更新
+    notify(){
+        this.subs.forEach((sub) =>{
+            sub.update()
+        })
+    }
+}
+Dep.target = null;
+// -------------vue的watcher-------------
+class Watcher {
+    constructor(vm, exp, cb) {
+        this.vm = vm;
+        this.exp = exp;
+        this.cb = cb;
+        this.value = this.get();
+    }
+    update() {
+        let value = this.vm.data[this.exp];
+        let oldVal = this.value;
+        if (value !== oldVal) {
+            this.value = value;
+        }
+        this.cb.call(this.vm, value, oldVal)
+    }
+    get() {
+        Dep.target = this;
+        let value = this.vm.data[this.exp];
+        Dep.target = null;
+        return value;
+    }
+}
+
+// reduce 数组去重并打印当前元素存在几个
+// const arr12 = [1,2,3,4,2,2];
+// let obj1 = {};
+// let val1 = arr12.reduce((cur, next) => {
+//     if (!obj1[next]) {
+//         cur.push(next);
+//         obj1[next] = 1;
+//     } else {
+//         obj1[next] = obj1[next]+1;
+//     }
+//     return cur;
+// }, [])
+// console.log(obj1);
+// console.log(val1);
+
+// 防抖
+let count = 1;
+let eventCb = () => {
+    count++;
+    console.log(count);
+}
+let debounce = (func, wait) => {
+    let timeout;
+    return function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(func, wait);
+    }
+}
+debounce(eventCb, 1000);

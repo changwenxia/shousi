@@ -44,7 +44,8 @@ let arr2 = [2,3,10,11,6,13,14,15,16,17,18,19,20]
 
 let arrconcat = []
 // arrconcat.concat(arr1,arr2)
-console.log(arrconcat.concat(arr1,arr2).sort(hmy))
-function hmy(a,b){
-  return a-b
-}
+// console.log(arrconcat.concat(arr1,arr2).sort(hmy))
+// function hmy(a,b){
+//   return a-b
+// }
+console.log(arrconcat.concat(arr1, arr2).sort((a, b) => a-b));
