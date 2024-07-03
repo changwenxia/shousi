@@ -1,6 +1,7 @@
 var count = 1;
-function getUserAction () {
-  count++;
+var container = document.getElementById("container");
+function getUserAction(e){
+  container.innerHTML = count ++;
 }
 
 function debounce(func, wait) {
@@ -10,4 +11,5 @@ function debounce(func, wait) {
     timeout = setTimeout(func, wait)
   }
 }
-debounce(getUserAction, 1000);
+container.onmousemove = debounce(getUserAction, 1000);
+// debounce(getUserAction, 1000);

@@ -31,4 +31,4 @@ function debounce(func, time, immediate) {
 function foramt(num) {
     return num && num.replace(/\d{3}/g, '',);
 }
-foramt(1123);
+foramt(z);

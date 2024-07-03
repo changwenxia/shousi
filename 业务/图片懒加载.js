@@ -16,6 +16,7 @@ function lazyImgsActions() {
     })
 
 }
+// getBoundingRect方式
 function lazyImgByGetBoundingClientRect() {
     const lazyImgs = document.querySelectorAll('img[data-src]');
     if (lazyImgs.length === 0) {
@@ -31,7 +32,7 @@ function lazyImgByGetBoundingClientRect() {
         }
     })
 }
-
+ // observer方式
 function lazyImgsByIntersectionObserver() {
     const lazyImgs = document.querySelectorAll('img[data-src]');
     if (lazyImgs.length === 0) {

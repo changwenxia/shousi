@@ -654,7 +654,7 @@ const nums = [5,7,7,8,8,10];
 const target = 6;
 pop(nums, target);
 
-// 深拷贝
+// --------------  深拷贝   --------------
 // 思路：从第一层开始获取key,并判断值类型，设置新的临时值，如果是数组和对象则递归执行
 
 function deepClone(obj) {
@@ -672,12 +672,40 @@ function deepClone(obj) {
     }
     return cloneObj;
 }
-// let a1 = [20,8,6,19],
-// b1 = deepClone(a1);
-// a1[1] = 2;
-// console.log(a1, b1);
+// 解决循环引用问题，我们可以额外开辟一个存储空间，来存储当前对象和拷贝对象的对应关系，当需要拷贝当前对象时，先去存储空间中找，有没有拷贝过这个对象，如果有的话直接返回，如果没有的话继续拷贝，这样就巧妙化解的循环引用的问题。
+// 这个存储空间，需要可以存储key-value形式的数据，且key可以是一个引用类型，我们可以选择Map这种数据结构：
 
-// 手写bind
+// 检查map中有无克隆过的对象
+// 有 - 直接返回，没有 - 将当前对象作为key，克隆对象作为value进行存储
+// 继续克隆
+function deepClone1(obj, map = new WeakMap()) {
+    if (typeof obj !== 'object') return obj;
+    if (map.get(obj)) return map.get(obj);
+    let cloneObj = Array.isArray(obj) ? [] : {};
+    map.set(obj, cloneObj);
+    for(let key in obj) {
+        if(obj.hasOwnProperty(key)) {
+            cloneObj[key] = deepClone1(obj[key], map);
+        }
+    }
+    return cloneObj;
+}
+
+// const target1 = {
+//     field1: 1,
+//     field2: undefined,
+//     field3: {
+//         child: 'child'
+//     },
+//     field4: [2, 4, 8]
+// };
+// target1.target = target1;
+// const copy1 = deepClone1(target1);
+// target1.d = [2,3.4,5];
+// console.log(copy1); 
+// console.log(target1); 
+
+//  --------------  手写bind --------------  
 Function.prototype.mybind = function (context, ...bindments) {
     cotext = context || window;
     const func = this;
@@ -1034,7 +1062,28 @@ function shellSort(arr) {
     }
     return arr;
 }
-
+// 第2种写法
+function shellSort1(nums) {
+    const len = nums.length;
+    // 比插入排序多了设置步长这一步
+    for (let step = len >> 1; step > 0; step >>= 1) {
+      for (let i = step; i < len; i++) {
+        // 按 step 先取出关键牌
+        const key = nums[i];
+        // 要比较的前一位
+        let j = i - step;
+        while(j >= 0 && nums[j] > key) {
+          // 把前一位赋值给后一位
+          nums[j + step] = nums[j];
+          // 按 step 值步进
+          j -= step;
+        }
+        // 把关键牌放到前一位上
+        nums[j + step] = key;
+      }
+    }
+    return nums;
+  }
 // 6.桶排序
 // 取 n 个桶，根据数组的最大值和最小值确认每个桶存放的数的区间，将数组元素插入到相应的桶里，最后再合并各个桶。
 function bucketSort(arr) {
@@ -1051,6 +1100,109 @@ function bucketSort(arr) {
     }
     return newArr;
 }
+// 7.计数排序
+// 找出待排序的数组中最大和最小的元素；
+// 统计数组中每个值为i的元素出现的次数，存入数组C的第i项；
+// 对所有的计数累加（从C中的第一个元素开始，每一项和前一项相加）；
+// 反向填充目标数组：将每个元素i放在新数组的第C(i)项，每放一个元素就将C(i)减去1。
+function countingSort(arr, maxValue) {
+    var bucket = new Array(maxValue + 1),
+        sortedIndex = 0;
+        arrLen = arr.length,
+        bucketLen = maxValue + 1;
+    for (var i = 0; i < arrLen; i++) {
+        if (!bucket[arr[i]]) {
+            bucket[arr[i]] = 0;
+        }
+        bucket[arr[i]]++;
+    }
+    for (var j = 0; j < bucketLen; j++) {
+        while(bucket[j] > 0) {
+            arr[sortedIndex++] = j;
+            bucket[j]--;
+        }
+    }
+    return arr;
+}
+// 8.归并排序
+function mergeSort(nums) {
+    const len = nums.length;
+    // 递归到最小层的时候，终止条件
+    if (len < 2) return nums;
+    // 折半分组，一直折半到只剩一个元素为止，这就是分治的思想
+    let pivot = len >> 1;
+    let leftNums = mergeSort(nums.slice(0, pivot));
+    let rightNums = mergeSort(nums.slice(pivot));
+    // 这一步就是从最小层开始，分别把折半后的左边和右边的数排好序，最后出来的就是排好序的数据了。
+    // 归并
+    return merge(leftNums, rightNums);
+  }
+  
+  function merge(leftNums, rightNums) {
+    // 额外申请一个 n 的空间
+    const result = [];
+    while (leftNums.length > 0 && rightNums.length > 0) {
+      if (leftNums[0] <= rightNums[0]) {
+        result.push(leftNums.shift());
+      } else {
+        result.push(rightNums.shift());
+      }
+    }
+    return result.concat(leftNums, rightNums);
+  }
+// 9.堆排序
+// 1、把数组看成是二叉树形结构，按照顺序一路二三排将下来
+// 2、找子结点公式：已知父结点是 i，那么其左右子结点分别是：2i+1 和 2i+2
+// 3、子结点比父结点大，交换一下；继续比较孙结点......
+// 4、树顶最大元素和最后一个元素交换，这时最后的元素就是排好序的了。
+function swap(nums, i, j) {
+    const temp = nums[i];
+    nums[i] = nums[j];
+    nums[j] = temp;
+  }
+  
+  function maxHeapify(nums, start, end) {
+    // 建立父结点和子结点
+    let dad = start;
+    // dad * 2 + 1 可以找到左子结点
+    let son = (dad << 1) + 1;
+    // 若子结点在范围内才做比较
+    while (son <= end) {
+      // 先比较两个子结点大小，选择最大的
+      if (son + 1 <= end && nums[son] < nums[son + 1]) {
+        son += 1;
+      }
+      // 如果父结点大于子结点代表调整完毕，直接跳出函数
+      if (nums[dad] > nums[son]) {
+        return;
+      } else {
+        // 否则交换父子内容，再继续子结点和孙结点比较
+        swap(nums, dad, son);
+        dad = son;
+        son = (dad << 1) + 1;
+      }
+    }
+  }
+  
+  function heapSortMethod(nums, len) {
+    // 初始化，i 从最后一个父结点开始调整，(len / 2) - 1 一定能找到最后一个父结点
+    for (let i = (len >> 1) - 1; i >= 0; i--) {
+      maxHeapify(nums, i, len - 1);
+    }
+    // 初始化最大顶堆调整完了，这时把堆顶元素和最末一个元素交换，这样最末尾的元素就是排好序的了
+    for (let j = len - 1; j > 0; j--) {
+      swap(nums, 0, j);
+      maxHeapify(nums, 0, j - 1);
+    }
+  }
+  
+  function heapSort(nums) {
+    const arr = [...nums];
+    heapSortMethod(arr, arr.length);
+    return arr;
+  }
+  
+//   console.log(heapSort([6, 1, 9, 4, 2, 7, 0]));
 // let arr1 = [8, 3, 5, 9, 2, 3, 0, 8]
 // console.log(bucketSort(arr1));
 // 数组去重
@@ -1684,18 +1836,219 @@ class Watcher {
 // }, [])
 // console.log(obj1);
 // console.log(val1);
-
-// 防抖
+// 普通版防抖
+// let count = 1;
+// let eventCb = () => {
+//     count++;
+//     console.log(count);
+// }
+// let debounce = (fn, wait) => {
+//     let timer;
+//     return function() {
+//         let _this = this;
+//         if (timer) {
+//             clearTimeout(timer);
+//         }
+//         timeout = setTimeout((...args) =>{
+//             fn.apply(_this, args)
+//         }, wait);
+//     }
+// }
+// debounce(eventCb, 1000);
+// 优化版防抖
 let count = 1;
 let eventCb = () => {
     count++;
     console.log(count);
 }
-let debounce = (func, wait) => {
-    let timeout;
-    return function() {
+function debounce(func, wait, immediate) {
+    let timeout, result;
+    let debounced = function() {
+        let context = this;
+        let args = arguments;
+        if (timeout) clearTimeout(timeout);
+        if (immediate) {
+            // 如果已经执行过，不再执行
+            let callNow = !timeout;
+            timeout = setTimeout(function() {
+                timeout = null;
+            }, wait);
+            if (callNow) {
+                result = func.apply(context, args)
+            }
+        } else {
+            timeout = setTimeout(function() {
+                func.apply((context, args))
+            }, wait)
+        };
+        return result;
+    }
+    debouce.cancel = function() {
         clearTimeout(timeout);
-        timeout = setTimeout(func, wait);
+        timeout = null;
+    }
+    return debouce;
+}
+
+
+// var setUseAction=debounce(getUserAction, 3000, true);
+// container.onmousemove = setUseAction;
+// document.getElementById("button").addEventListener("click", function(){
+//   setUseAction.cancel();
+// });
+
+// 图片懒加载
+// window.onload = lazyImg;
+// function lazyImg() {
+//     const lazyImgs = document.querySelectorAll('img[data-src]');
+//     if (lazyImgs.length === 0) {
+//         return;
+//     }
+//     const scrollTop = document.documentElement.scrollTop;
+//     const wh = window.innerHeight;
+//     //图片懒加载-传统方式
+//     lazyImgs.forEach(item => {
+//         if (item.offsetTop <= (scrollTop + wh)) {
+//             item.src= item.getAttribute('data-src');
+//             item.removeAttribute('data-src');
+//         }
+//     });
+//     // getBoundingRect方式
+//     lazyImgs.forEach(item => {
+//         const container = item.getBoundingClientRect();
+//         if (container.top <= wh) {
+//             item.src= item.getAttribute('data-src');
+//             item.removeAttribute('data-src');
+//         }
+//     });
+//     const ob = new IntersectionObserver(entries => {
+//         entries.forEach(item => {
+//             const container = item.target;
+//             if (item.isIntersecting) {
+//                 container.src = container.getAttribute('data-src');
+//                 container.removeAttribute('data-src');
+//                 ob.unobserve(container);
+//             }
+//         })
+//     })
+//     lazyImgs.forEach(item => ob.observe(item));
+// }
+
+// 并行限制的promise调度器
+// 实现有并行限制的 Promise 调度器问题。一个任务并发控制器，要求每次都有两个任务在执行：
+// 正常情况下，promise是没有并发数量限制的，同一个时间可以多个请求同时执行，然后谁返回的速度快，在前端页面直观的就可以打印谁的返回内容。
+// 限制并发数量，假定并发数量最大是2。什么意思呢，就是我们上面例子中，执行任务的盒子，第一个addTask可以放进去，第二个也可以放进去，但第三个不可以立马放进去，因为最大并发数量是2，需要过1000ms，等第二个addTask执行完毕后，那此刻执行任务盒子里只有1个盒子，可以把第三个放进。。。。
+
+class Scheduler {
+    constructor() {
+        this.queue = []; // 任务队列
+        this.maxCount = 2; // 最大并行数
+        this.runCounts = 0; // 跑了几个任务了
+    }
+    add(fn) {
+        this.queue.push(fn);
+    }
+    taskStart() {
+        for(let i =0;i<this.maxCount;i++) {
+            this.request();
+        }
+    }
+    request() {
+        if (this.queue.length === 0 || this.runCounts > this.maxCount) {
+            return;
+        }
+        this.runCounts++;
+        // 不同情况要改造
+        this.queue.shift()().then(() => {
+            // 这里 this.queue.shift() 和 !this.queue || !this.queue.length 可以用这种办法
+            this.runCounts--;
+            this.request();
+        })
     }
 }
-debounce(eventCb, 1000);
+const timeout = (time) => new Promise(resolve => setTimeout(resolve, time));
+
+const scheduler = new Scheduler();
+const addTask = (time, order) => {
+    scheduler.add(() => {
+        return timeout(time).then(() => console.log(order));
+    })
+}
+// addTask(1000, "1");
+// addTask(500, "2");
+// addTask(300, "3");
+// addTask(400, "4");
+// scheduler.taskStart();
+
+// 防抖debounce
+function debounce(fn, time, immediate) {
+    let timeout, res;
+
+    let debounced = function() {
+        let _this = this,args = arguments;
+        if (timeout) clearTimeout(timeout);
+        if (immediate) {
+            let callNow = !timeout;
+            timeout = setTimeout(function() {
+                timeout = null
+            }, time);
+            if (callNow) res = fu.apply(_this, args);
+        } else {
+            timeout = setTimeout(function() {
+                fn.apply(_this, args);
+            }, time)
+        }
+        return res;
+    }
+    debounced.cancel = function() {
+        clearTimeout(timeout);
+        timeout = null;
+    }
+    return debounced;
+}
+
+// -------函数的特性与原型链案例-------
+// 参考https://juejin.cn/post/6844904013754793991#heading-15
+// 首先，定义一个函数，将会作为构造函数
+// function Foo() {}
+// // 实例化出来一个对象
+// const obj1 = new Foo();
+// // 在 Object 的原型上定义一个属性：objProp
+// Object.prototype.objProp = '我是 Object 原型上的属性';
+// // 在 Function 的原型上定义一个属性：funcProp
+// Function.prototype.funcProp = '我是 Function 原型上的属性';
+// // 你预想一下，以下这些分别会输出什么？
+// // 你预想一下，以下这些分别会输出什么？
+// console.log(obj.objProp) // ?我是 Object 原型上的属性
+// // obj.__proto__ === Foo.prototype,  Foo.prototype.__proto__=== Object.prototype有objProp
+
+// console.log(obj.funcProp) // ?undefined
+// // obj.__proto__ === Foo.prototype, Foo.prototype.__proto__=== Object.prototype，Object.prototype上找不到funcProp
+
+// console.log(Foo.objProp) // ?我是 Object 原型上的属性
+// // Foo.__proto__ === Function.prototype, Function.prototype.__proto__=== Object.prototype, 有objProp
+
+// console.log(Foo.funcProp) // ?我是 Function 原型上的属性
+// // Foo.__proto__ === Function.prototype, funcProp
+
+
+// console.log(Object.objProp) // ?我是 Object 原型上的属性
+// // object是个函数对象, Object.__proto__ === Function.prototype,  Function.prototype.__proto__=== Object.prototype, 有objProp
+
+
+// console.log(Object.funcProp) // ?我是 Function 原型上的属性
+// // object是个函数对象, Object.__proto__ === Function.prototype,有funcProp
+
+
+// console.log(Function.objProp) // ?我是 Object 原型上的属性
+// // Function是个函数对象，Function.__proto__ === %Function.prototype，%Function.prototype.__proto__ === Object.prototype, 有objProp
+
+
+// console.log(Function.funcProp) // ?我是 Function 原型上的属性
+// // Function是个函数对向，Function.__proto__ === %Function.prototype,有funcProp
+
+// console.log(Array.objProp) // ?我是 Object 原型上的属性
+// // array是个函数对象，Array.__proto__ === Function.prototype，Function.prototype.__proto__=== Object.prototype, 有objProp
+
+// console.log(Array.funcProp) // ?我是 Function 原型上的属性
+// // // array是个函数对象，Array.__proto__ === Function.prototype，有funcProp
