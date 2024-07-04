@@ -1,6 +1,8 @@
 // 手写bind
 Function.prototype.bind = function (context, ...bindments) {
-    context = context || window;
+    if(typeof this !== 'function') {
+        throw new Error('必须函数调用bind');
+    }
     const func = this;
     return function F(...callments) {
         let args = bindments.concat(callments);
@@ -8,6 +10,19 @@ Function.prototype.bind = function (context, ...bindments) {
         return func.call(context, ...args);
     };
 };
+function one(a, b) {
+    this.a = a;
+    this.b = b;
+    console.log(this)
+  }
+  var obj = {
+    name: 'yiyi'
+  }
+  var child = one.bind(obj, 2);
+  child(3);
+  
+  var two = new child(4);
+  console.log(two)
 // call
 Function.prototype.call = function (context, ...callargs) {
     context = context || window;
@@ -42,16 +57,4 @@ Function.prototype.apply = function (context, arr) {
 // }
 // bar.call(foo, "programmer", 20);
 // bar.apply(null, ["teacher", 25]);
-function one(a, b) {
-  this.a = a;
-  this.b = b;
-  console.log(this)
-}
-var obj = {
-  name: 'yiyi'
-}
-var child = one.bind(obj, 2);
-child(3);
 
-var two = new child(4);
-console.log(two)

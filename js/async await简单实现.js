@@ -1,3 +1,4 @@
+// async await简单实现
 // 参考https://juejin.cn/post/6967260930862219272
 function runGenerator(gen) {
     return new Promise((resolve, reject) => {
@@ -32,8 +33,8 @@ function runGenerator(gen) {
       }
   }
   
-//   const gen = runGenerator(myGenerator); 
-//   console.log(gen);
+  const gen = runGenerator(myGenerator); 
+  console.log(gen);
   
 let obj = {
     name: 'aa',

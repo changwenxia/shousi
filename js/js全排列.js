@@ -1,3 +1,4 @@
+// js全排列
 // https://www.cnblogs.com/EaVango/p/15526330.html
 // 从n个不同元素中任取m（m≤n）个元素，按照一定的顺序排列起来，叫做从n个不同元素中取出m个元素的一个排列。当m=n时所有的排列情况叫全排列。
 
@@ -11,22 +12,26 @@ const arrange = (arr = []) => {
     let resArr = [];
 
     /**
-    * 实现排列handle
-    * tempArr 已排列的
-   * leftArr 待排列的
-    **/
+     * 实现排列handle
+     * tempArr 已排列的
+     * leftArr 待排列的
+     **/
     let idx = 0;
 
     function arrangeCb(tempArr, leftArr) {
         idx++;
         if (tempArr.length === arr.length) {
-            console.log(`排列完成第${ idx }次，[${ tempArr }]`);
+            console.log(`排列完成第${idx}次，[${tempArr}]`);
             resArr.push(tempArr);
         } else {
             leftArr.forEach((item, index) => {
                 let temp = [].concat(leftArr);
                 temp.splice(index, 1);
-                console.log(`第${ idx }次排列，已排列：[${ tempArr.concat(item) }]，未排列：[${ temp }]`);
+                console.log(
+                    `第${idx}次排列，已排列：[${tempArr.concat(
+                        item
+                    )}]，未排列：[${temp}]`
+                );
                 arrangeCb(tempArr.concat(item), temp);
             });
         }
@@ -35,8 +40,8 @@ const arrange = (arr = []) => {
     arrangeCb([], arr);
     return resArr;
 };
-let a = arrange([1,2]);
-console.log(a);
+// let a = arrange([1,2]);
+// console.log(a);
 
 // 第1次排列，已排列：[1]，未排列：[2,3,4]
 // 第2次排列，已排列：[1,2]，未排列：[3,4]
@@ -62,19 +67,39 @@ let arrange1 = (arr = []) => {
     let arrangeCb = (tempArr, leftArr) => {
         idx++;
         if (tempArr.length === arr.length) {
-            console.log(`排列完成第${ idx }次，[${ tempArr }]`);
+            console.log(`排列完成第${idx}次，[${tempArr}]`);
             resArr.push(tempArr);
         } else {
             leftArr.forEach((item, index) => {
                 let temp = [].concat(leftArr);
                 temp.splice(index, 1);
-                console.log(`第${ idx }次排列，已排列：[${ tempArr.concat(item) }]，未排列：[${ temp }]`);
+                console.log(
+                    `第${idx}次排列，已排列：[${tempArr.concat(
+                        item
+                    )}]，未排列：[${temp}]`
+                );
 
                 arrangeCb(tempArr.concat(item), temp);
-            })
+            });
         }
-    }
+    };
     arrangeCb([], arr);
     return resArr;
-}
-// arrange1([1, 2]);
+};
+let parenthesis11 = (arr) => {
+    let len = arr.length;
+    let result = [];
+    (function handler(temp, remaind) {
+        //最后得到的结果是一个字符串数组
+        if (temp.length == len) result.push(temp.join(""));
+        console.log(temp, remaind);
+        remaind.forEach((item, index) => {
+            let cur = [...remaind];
+            cur.splice(index, 1);
+            console.log('========', item, cur);
+            handler(temp.concat(item), cur);
+        });
+    })([], arr);
+    return [...new Set(result)]; //去重
+};
+console.log(parenthesis11([1, 2]));

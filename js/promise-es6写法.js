@@ -1,3 +1,4 @@
+// promise-es6写法
 // 参考：https://www.bilibili.com/video/BV1jP4y117Hc/?spm_id_from=333.337.search-card.all.click&vd_source=e8999a538a8fb41f0b978c25d61cdea7
 class MyPromise {
     constructor(executor) {
@@ -165,29 +166,29 @@ let p1 = new MyPromise((resolve, reject) => {
    
 //   let p3 = MyPromise.reject('失败')
    
-  MyPromise.all([p1, p2]).then((result) => {
+MyPromise.all([p1, p2]).then((result) => {
     console.log(result)               //['成功了', 'success']
   }).catch((error) => {
     console.log(error)
   })
   
 
-// const p = new MyPromise((resolve, reject) => {
-//     setTimeout(() => {
-//       resolve(1)
-//     }, 1000)
-//   })
+const p = new MyPromise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(1)
+    }, 1000)
+  })
   
-//   p.then(res => {
-//     console.log('first then', res)
-//     return res + 1
-//   }).then(res => {
-//     console.log('first then', res)
-//   })
+  p.then(res => {
+    console.log('first then', res)
+    return res + 1
+  }).then(res => {
+    console.log('first then', res)
+  })
   
-//   p.then(res => {
-//     console.log(`second then`, res)
-//     return res + 1
-//   }).then(res => {
-//     console.log(`second then`, res)
-//   })
+  p.then(res => {
+    console.log(`second then`, res)
+    return res + 1
+  }).then(res => {
+    console.log(`second then`, res)
+  })

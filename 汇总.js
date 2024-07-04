@@ -719,44 +719,47 @@ Function.prototype.mybind = function (context, ...bindments) {
 //     this.a = a;
 //     this.b = b;
 //     console.log(this)
-// }
-// let obj1 = {
+//   }
+//   var obj1 = {
 //     name: 'yiyi'
-// }
-// let child = one.mybind(obj1, 2);
-// child(3);
+//   }
+//   var child = one.mybind(obj1, 2);
+//   child(3);
+  
+//   var two = new child(4);
+//   console.log(two)
 // 手写call
 Function.prototype.myCall = function(context, ...args) {
-    context = context || window;
-    context.func = this;
-    if (typeof context.func !== 'function') {
+    if (typeof this !== 'function') {
         throw new TypeError('必须是函数调用call');
     }
+    context = context || window;
+    context.func = this;
     let res = context.func(...args);
     delete context.func;
     return res;
 }
 // 手写apply
 Function.prototype.myApply = function(context, arr) {
-    context = context || window;
-    context.func = this;
     if (typeof context.func !== 'function') {
         throw new TypeError('必须是函数调用call');
     }
+    context = context || window;
+    context.func = this;
     let res = context.func(...arr);
     delete context.func;
     return res;
 }
-var foo = {
-    name: "Selina",
-};
-var name = "Chirs";
+// var foo = {
+//     name: "Selina",
+// };
+// var name = "Chirs";
 
-function bar(job, age) {
-    console.log(this.name);
-    console.log(job, age);
-}
-// bar.myApply(foo, ["programmer", 20]);
+// function bar(job, age) {
+//     console.log(this.name);
+//     console.log(job, age);
+// }
+// bar.myCall(foo, "programmer", 20);
 
 // 父子通信 eventEmitter
 class EventEmitter{
@@ -2052,3 +2055,402 @@ function debounce(fn, time, immediate) {
 
 // console.log(Array.funcProp) // ?我是 Function 原型上的属性
 // // // array是个函数对象，Array.__proto__ === Function.prototype，有funcProp
+
+// ajax并发请求限制
+// 实现一个批量请求函数 multiRequest(urls, maxNum, callback)，要求如下：
+// 要求最大并发数 maxNum
+// 每当有一个请求返回，就留下一个空位，可以增加新的请求
+// 所有请求完成后，结果按照 urls 里面的顺序依次打出
+// multiRequest 可以返回一个 promise 或者 直接执行 callback 回调
+
+// 思路：
+// 整体采用递归调用来实现：最初发送的请求数量上限为允许的最大值，并且这些请求中的每一个都应该在完成时继续递归发送，通过传入的索引来确定了urls里面具体是那个URL，保证最后输出的顺序不会乱，而是依次输出。
+
+// 参考：https://cloud.tencent.com/developer/article/1784512
+let urlIndex = 0;
+const axios = (url)=>{
+    return new Promise((resolve,reject)=>{
+        setTimeout(()=>{
+            resolve(url + `/?username=${++urlIndex}&password=${urlIndex}`);
+        },1000)
+    })
+}
+function multiRequest(urls = [], maxNum, callback) {
+    // 请求总数量
+    const len = urls.length;
+    // 根据请求数量创建一个数组来保存请求的结果
+    let result = new Array(len).fill(false);
+    // 当前完成的数量
+    let count = 0;
+    return new Promise((resolve, reject) => {
+        // 请求maxNum个
+        while(count < maxNum) {
+            next();
+        }
+        function next() {
+            const current = count++;
+            console.log(current, count, len, current >= len, result);
+            // 处理边界条件
+            if (current >= len) {
+                // 请求全部完成就将promise置为成功状态, 然后将result作为promise值返回
+                !result.includes(false) && resolve(result);
+                callback && callback(result);
+                return;
+            }
+            const url = urls[current];
+            // console.log(url, '开始');
+            axios(url).then(res => {
+                // 保存请求结果
+                result[current] = res;
+                // console.log(url, '结束');
+                // 请求没有全部完成, 就递归
+                if (current < len) {
+                    next();
+                }
+            }).catch(err => {
+                result[current] = err;
+                // console.log(url, '失败');
+                // 请求没有全部完成, 就递归
+                if (current < len) {
+                    next();
+                }
+            })
+        }
+    })
+}
+const urls = ["/url1","/url2","/url3","/url4","/url5","/url6"];
+// multiRequest(urls, 2, data=>{
+//     console.log(data);
+// })
+
+// 请求并发数量限制
+// 题2：实现一个并发请求控制，你可以创建一个管理请求的队列，并通过设置一个最大并发数来控制同时进行的请求数量。
+// 当一个请求完成时，你可以从队列中取出下一个请求并执行它。以下是一个简单的 JavaScript 例子，它展示了如何使用 Promise 来管理并发请求。
+// 假设我们有一个 sendRequest 函数，这个函数接收一个 url，并返回一个 Promise。我们的目标是控制这些请求的并发数。
+class RequestQueue {
+    constructor(maxConcurrent) {
+      this.maxConcurrent = maxConcurrent; // 设置最大并发数
+      this.currentRunning = 0; // 当前正在运行的请求数
+      this.queue = []; // 等待执行的请求队列
+    }
+  
+    // 将请求封装成一个函数，推入队列，并尝试执行
+    enqueue(url) {
+      return new Promise((resolve, reject) => {
+        const task = () => {
+          // 当请求开始时，currentRunning 加 1
+          this.currentRunning++;
+          sendRequest(url).then(resolve).catch(reject).finally(() => {
+            // 请求结束后，currentRunning 减 1，并尝试执行下一个请求
+            this.currentRunning--;
+            this.dequeue();
+          });
+        };
+        this.queue.push(task);
+        this.dequeue(); // 每次添加请求后尝试执行请求
+      });
+    }
+  
+    dequeue() {
+      // 如果当前运行的请求小于最大并发数，并且队列中有待执行的请求
+      if (this.currentRunning < this.maxConcurrent && this.queue.length) {
+        // 从队列中取出一个请求并执行
+        const task = this.queue.shift();
+        task();
+      }
+    }
+}
+  
+// 这个函数是模拟发送请求的，实际中你可能需要替换成真实的请求操作
+function sendRequest(url) {
+    console.log(url, '开始');
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        console.log(url, '响应');
+        resolve(`Result from ${url}`);
+      }, Math.random() * 2000); // 随机延时以模拟请求处理时间
+    });
+}
+  
+// 使用 RequestQueue
+const requestQueue = new RequestQueue(3); // 假设我们限制最大并发数为3
+  
+// 模拟批量请求
+// const urls1 = ['url1', 'url2', 'url3', 'url4', 'url5', 'url6'];
+// urls1.forEach(url => {
+//     requestQueue.enqueue(url).then(result => {
+//       console.log(result);
+//     });
+// });
+
+// async await简单实现
+// 参考https://juejin.cn/post/6967260930862219272
+function runGenerator(gen) {
+    return new Promise((resolve, reject) => {
+        let g = gen();
+        function _next(val) {
+            let res = null;
+            try {
+                res = g.next(val);
+            } catch (error) {
+                return reject(error);
+            }
+            if (res.done) {
+                return resolve(res.value);
+            }
+            Promise.resolve(res.value).then(
+                value => _next(value),
+                err => g.throw(err)
+            )
+        }
+        _next();
+    })
+}
+
+function* myGenerator() {
+    try {
+        const res1 = yield Promise.resolve(1);
+        console.log('res1:', res1);
+        const res2 = yield 2;
+        console.log('res2:', res2);
+        const res3 = yield Promise.reject('error');
+        console.log('res3:', res3);
+    } catch (error) {
+        console.log(error);
+    }
+}
+// const gen = runGenerator(myGenerator); 
+// console.log(gen);
+
+// js 全排列
+// https://www.cnblogs.com/EaVango/p/15526330.html
+// 从n个不同元素中任取m（m≤n）个元素，按照一定的顺序排列起来，叫做从n个不同元素中取出m个元素的一个排列。当m=n时所有的排列情况叫全排列。
+
+// 如果有m个元素，全排列的可能方式有m!种，即3个元素，有3*2*1=6种。4个元素有4*3*2*1=24种。
+
+// 怎么用算法实现呢，我们可以参照下图，遍历整个数组，取出遍历的元素，放到一个temp数组中，然后把剩余元素递归地继续去做遍历，继续取出元素放到temp中，最后当temp中的元素与原数组长度相同时候，递归结束，temp数组也即是全排列的一种情况。
+let parenthesis = arr => {
+    let len = arr.length, res = [];
+    (function handler(tmp, remain) {
+        if (tmp.length === len) res.push(tmp.join(''));
+        remain.forEach((item, index) => {
+            let cur = [...remain];
+            cur.splice(index, 1);
+            handler(tmp.concat(item), cur);
+        })
+    })([], arr)
+    return [...new Set(res)];
+}
+// console.log(parenthesis([1, 2]));
+
+// new 实现
+// 首先创一个新的空对象。
+// 根据原型链，设置空对象的 __proto__ 为构造函数的 prototype 。
+// 构造函数的 this 指向这个对象，执行构造函数的代码（为这个新对象添加属性）。
+// 判断函数的返回值类型，如果是引用类型，就返回这个引用类型的对象。
+
+function myNew(fn) {
+    let obj = Object.create(fn.prototype);
+    let res = fn.apply(obj, [...arguments].slice(1));
+    return typeof res === 'object' ? res : obj;
+}
+// function AB(par) {
+//     this.one = 1,
+//     this.two = 2,
+//     this.print = function() {
+//         console.log(this.one, par);
+//     }
+// };
+// const b2 = myNew(AB, 23);
+// b2.print();
+
+
+// promise-es6写法
+// 参考：https://www.bilibili.com/video/BV1jP4y117Hc/?spm_id_from=333.337.search-card.all.click&vd_source=e8999a538a8fb41f0b978c25d61cdea7
+class MyPromise {
+    constructor(exector) {
+        this.status = 'pending';
+        this.result = null;
+        this.reason = null;
+        this.onFulfilledCallbacks = [];
+        this.onRejectedCallbacks = [];
+        
+        try {
+            exector(this.resolve.bind(this), this.reject.bind(this));
+        } catch (error) {
+            this.reject(error)
+        }
+    }
+
+    resolve(result) {
+        if (this.status === 'pending') {
+            this.status = 'fulfilled';
+            this.result = result;
+            this.onFulfilledCallbacks.forEach(fn => fn(result));
+        }
+    }
+    reject(reason) {
+        if (this.status === 'pending') {
+            this.status = 'rejected';
+            this.reason = reason;
+            this.onRejectedCallbacks.forEach(fn => fn(reason));
+        }
+    }
+    then(onFulfilled, onRejected) {
+        let promise2 = new MyPromise((resolve, reject) => {
+            if (this.status === 'fulfilled') {
+                setTimeout(() => {
+                    try {
+                        if (typeof onFulfilled !== 'function') {
+                            resolve(this.result);
+                        } else {
+                            let x = onFulfilled(this.result);
+                            resolvePromise2(promise2, x, resolve, reject);
+                        }
+                    } catch (error) {
+                        reject(error)
+                    }
+                })
+            } else if (this.status === 'rejected') {
+                setTimeout(() => {
+                    try {
+                        if (typeof onRejected === 'function') {
+                            reject(this.reason);
+                        } else {
+                            let x = onRejected(this.reason);
+                            resolvePromise2(Promise2, x, resolve, reject);
+                        }
+                    } catch (error) {
+                        reject(error);
+                    }
+                })
+            } else if (this.status === 'pending') {
+                this.onFulfilledCallbacks.push(() => {
+                    setTimeout(() => {
+                        try {
+                            if (typeof onFulfilled !== 'function') {
+                                resolve(this.result);
+                            } else {
+                                let x = onFulfilled(this.result);
+                                resolvePromise2(promise2, x, resolve, reject);
+                            }
+                        } catch (error) {
+                            reject(error);
+                        }
+                    })
+                })
+                this.onRejectedCallbacks.push(() => {
+                    setTimeout(() => {
+                        try {
+                            if (typeof onRejected === 'function') {
+                                reject(this.reason);
+                            } else {
+                                let x = onRejected(this.reson);
+                                resolvePromise2(promise2, x, resolve, reject);
+                            }
+                        } catch (error) {
+                            reject(error);
+                        }
+                    })
+                })
+            }
+        });
+        return promise2;
+    }
+    all(promiseArr) {
+        return new Promise((resolve, reject) => {
+            const len = promiseArr.length;
+            let res = [], count = 0;
+            if (len === 0) {
+                return resolve(res);
+            }
+            for(let [i, p] of promiseArr.entries()) {
+                MyPromise.resolve(p).then(data => {
+                    res[i] = data;
+                    count++;
+                    if (count == len) {
+                        resolve(res);
+                    }
+                },
+                reason => reject(reason)
+                )
+            }
+        })
+    }
+}
+
+function resolvePromise2(promise2, x, resolve, reject) {
+    if (x === promise2) {
+        throw new TypeError('promise error');
+    }
+    if (x instanceof MyPromise) {
+        x.then(y => resolvePromise2(promise2, y, resolve, reject), reject);
+    } else if (x !== null && (typeof x === 'object' || typeof x === 'function')) {
+        try {
+            let then = x.then;
+        } catch (error) {
+            return reject(error);
+        }
+        if (typeof then === 'function') {
+            let called = false;
+            try {
+                then.call(
+                    x, 
+                    y => {
+                        if (called) return;
+                        called = true;
+                        resolvePromise2(promise2, y, resolve, reject)
+                    },
+                    r => {
+                        if (called) return;
+                        called = true;
+                        reject(r);
+                    }
+                )
+            } catch (error) {
+                if (called) return;
+                called = true;
+                reject(error);
+            }
+        } else {
+            resolve(x)
+        }
+    } else {
+        return resolve(x);
+    }
+}
+
+let p1 = new MyPromise((resolve, reject) => {
+    resolve('成功了')
+  })
+   
+  let p2 = new MyPromise((resolve, reject) => {
+    resolve('success')
+  })
+   
+//   let p3 = MyPromise.reject('失败')
+   
+// MyPromise.all([p1, p2]).then((result) => {
+//     console.log(result)               //['成功了', 'success']
+//   }).catch((error) => {
+//     console.log(error)
+//   })
+  const p = new MyPromise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(1)
+    }, 1000)
+  })
+  
+  p.then(res => {
+    console.log('first then', res)
+    return res + 1
+  }).then(res => {
+    console.log('first then', res)
+  })
+  
+  p.then(res => {
+    console.log(`second then`, res)
+    return res + 1
+  }).then(res => {
+    console.log(`second then`, res)
+  })
