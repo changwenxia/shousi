@@ -57,49 +57,21 @@ const arrange = (arr = []) => {
 // 排列完成第10次，[1,3,2,4]
 // 以此类推
 
-let arrange1 = (arr = []) => {
-    if (arr.length === 0) {
-        return arr;
-    }
-    let resArr = [];
-    let idx = 0;
-
-    let arrangeCb = (tempArr, leftArr) => {
-        idx++;
-        if (tempArr.length === arr.length) {
-            console.log(`排列完成第${idx}次，[${tempArr}]`);
-            resArr.push(tempArr);
-        } else {
-            leftArr.forEach((item, index) => {
-                let temp = [].concat(leftArr);
-                temp.splice(index, 1);
-                console.log(
-                    `第${idx}次排列，已排列：[${tempArr.concat(
-                        item
-                    )}]，未排列：[${temp}]`
-                );
-
-                arrangeCb(tempArr.concat(item), temp);
-            });
-        }
-    };
-    arrangeCb([], arr);
-    return resArr;
-};
 let parenthesis11 = (arr) => {
     let len = arr.length;
     let result = [];
     (function handler(temp, remaind) {
+        console.log('aaaa', temp, remaind, temp.length == len);
         //最后得到的结果是一个字符串数组
         if (temp.length == len) result.push(temp.join(""));
         console.log(temp, remaind);
         remaind.forEach((item, index) => {
             let cur = [...remaind];
             cur.splice(index, 1);
-            console.log('========', item, cur);
+            console.log('========', item, cur, temp.concat(item));
             handler(temp.concat(item), cur);
         });
     })([], arr);
     return [...new Set(result)]; //去重
 };
-console.log(parenthesis11([1, 2]));
+// console.log(parenthesis11([1, 2]));

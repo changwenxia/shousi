@@ -18,9 +18,10 @@ function traverseFolder(folderPath) {
         traverseFolder(filePath)
       } else {
         // 如果是文件，执行操作
-        console.log(filePath)
+        list.push(filePath);
       }
     })
+    return list;
 }
 
 

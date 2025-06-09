@@ -9,60 +9,60 @@
 // 整体采用递归调用来实现：最初发送的请求数量上限为允许的最大值，并且这些请求中的每一个都应该在完成时继续递归发送，通过传入的索引来确定了urls里面具体是那个URL，保证最后输出的顺序不会乱，而是依次输出。
 
 // 参考：https://cloud.tencent.com/developer/article/1784512
-let index = 0;
-const axios = (url)=>{
-    return new Promise((resolve,reject)=>{
-        setTimeout(()=>{
-            resolve(url + `/?username=${++index}&password=${index}`);
-        },1000)
-    })
-}
+// let index = 0;
+// const axios = (url)=>{
+//     return new Promise((resolve,reject)=>{
+//         setTimeout(()=>{
+//             resolve(url + `/?username=${++index}&password=${index}`);
+//         },1000)
+//     })
+// }
 
-function multiRequest(urls = [], maxNum, callback) {
-  // 请求总数量
-  const len = urls.length;
-  // 根据请求数量创建一个数组来保存请求的结果
-  const result = new Array(len).fill(false);
-  // 当前完成的数量
-  let count = 0;
+// function multiRequest(urls = [], maxNum, callback) {
+//   // 请求总数量
+//   const len = urls.length;
+//   // 根据请求数量创建一个数组来保存请求的结果
+//   const result = new Array(len).fill(false);
+//   // 当前完成的数量
+//   let count = 0;
 
-  return new Promise((resolve, reject) => {
-    // 请求maxNum个
-    while (count < maxNum) {
-      next();
-    }
-    function next() {
-      let current = count++;
-      // 处理边界条件
-      if (current > len) {
-        // 请求全部完成就将promise置为成功状态, 然后将result作为promise值返回
-        !result.includes(false) && resolve(result);
-        callback && callback(result);
-        return;
-      }
-      const url = urls[current];
-      // console.log(url ,'开始');
-      axios(url)
-        .then((res) => {
-          // 保存请求结果
-          result[current] = res;
-          // console.log(url ,'完成');
-          // 请求没有全部完成, 就递归
-          if (current < len) {
-            next();
-          }
-        })
-        .catch((err) => {
-          // console.log(url ,'结束');
-          result[current] = err;
-          // 请求没有全部完成, 就递归
-          if (current < len) {
-            next();
-          }
-        });
-    }
-  });
-}
+//   return new Promise((resolve, reject) => {
+//     // 请求maxNum个
+//     while (count < maxNum) {
+//       next();
+//     }
+//     function next() {
+//       let current = count++;
+//       // 处理边界条件
+//       if (current > len) {
+//         // 请求全部完成就将promise置为成功状态, 然后将result作为promise值返回
+//         !result.includes(false) && resolve(result);
+//         callback && callback(result);
+//         return;
+//       }
+//       const url = urls[current];
+//       console.log(url ,'开始');
+//       axios(url)
+//         .then((res) => {
+//           // 保存请求结果
+//           result[current] = res;
+//           // console.log(url ,'完成');
+//           // 请求没有全部完成, 就递归
+//           if (current < len) {
+//             next();
+//           }
+//         })
+//         .catch((err) => {
+//           // console.log(url ,'结束');
+//           result[current] = err;
+//           // 请求没有全部完成, 就递归
+//           if (current < len) {
+//             next();
+//           }
+//         });
+//     }
+//   });
+// }
 
 // const urls = ["/url1","/url2","/url3","/url4","/url5","/url6"];
 // multiRequest(urls ,3).then(data=>{
@@ -74,7 +74,6 @@ function multiRequest(urls = [], maxNum, callback) {
 // multiRequest(urls, 2, data=>{
 //     console.log(data);
 // })
-
 
 
 // 请求并发数量限制

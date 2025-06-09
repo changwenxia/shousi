@@ -35,7 +35,7 @@
         createElement(vNode);
         if (parentEle !== null){
           api.insertBefore(parentEle.vnode.el,api.nextSibling(oEl))
-          api.removChuild(parent,oldVNode.el)
+          api.removChild(parent,oldVNode.el)
           oldVNode = null;
         }
         return vNode;

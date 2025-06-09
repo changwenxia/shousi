@@ -21,4 +21,4 @@ function add(...args) {
 }
 
 // add(1)(2)(3)
-console.log(add(1)(2)(3)(4)(5).toString());
+console.log(add1(1)(2)(3)(4)(5).toString());

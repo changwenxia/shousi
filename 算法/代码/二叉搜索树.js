@@ -30,16 +30,21 @@ class BinarySearchTree {
     }
   }
 
+   /**
+   * 创建要给插入节点的方法
+   * @param {number | array[number]} val
+   * @returns
+   */
   insertNode(val) {
     const that = this;
     // 允许接收一个数组，批量插入
-    if (Object.prototype.toString.call(val) === "[obejct Array]") {
+    if (Object.prototype.toString.call(val) === "[object Array]") {
       val.forEach(v => that.insertNode(v));
       return;
     }
 
-    if (typeof val !== 'number') throw newError('不是一个数字');
-    const newNode = this.node(val);
+    if (typeof val !== 'number') console.error('不是一个数字');
+    const newNode = this.Node(val);
     if (this.root) {
       // 根节点非空
       this.#insertNode(this.root, newNode);
@@ -87,9 +92,99 @@ class BinarySearchTree {
     }
     return;
   }
+  // 中序遍历这个树
+
+  static inorder(root) {
+    if (!root) return
+    const result = []
+    const stack = []
+    // 定义一个指针
+    let p = root
+    // 如果栈中有数据或者p不是null，则继续遍历
+    while (stack.length || p) {
+      // 如果p存在则一致将p入栈并移动指针
+      while (p) {
+        // 将 p 入栈，并以移动指针
+        stack.push(p)
+        console.log(stack, p.val);
+        p = p.left
+      }
+
+      const node = stack.pop()
+      result.push(node.val)
+      p = node.right
+    }
+    return result
+  }
 };
 
-const tree = new BinarySearchTree()
+
+
+class BinarySearchTree1 {
+  constructor() {
+    this.root = null;
+  }
+
+  Node(val) {
+    return {
+      left: null,
+      right: null,
+      parent: null,
+      val,
+    }
+  }
+
+  insertNode(val) {
+    const that = this;
+    if (Object.prototype.toString.call(val) === '[object Array]') {
+      val.forEach(v => that.insertNode(v));
+      return;
+    }
+    if (typeof val !== 'number') {
+      console.error('不是一个数字');
+      return;
+    }
+    const newNode = this.Node(val);
+    if (this.root) {
+      this.#insertNode(this.root, newNode);
+    } else {
+      this.root = newNode;
+    }
+  }
+  #insertNode(root, newNode) {
+    if (newNode.val < root.val) {
+      if (root.left = null) {
+        root.left = newNode;
+        root.left.parent = root;
+      } else {
+        this.#insertNode(root.left, newNode);
+      }
+    } else {
+      if (root.right === null) {
+        root.right = newNode;
+        root.right.parent = root;
+      } else {
+        this.#insertNode(root.right, newNode)
+      }
+    }
+  }
+  static inorder(root) {
+    if (!root) return;
+    const res = [], stacks = [];
+    let p = root;
+    while(stacks.length || p) {
+      while (p) {
+        stacks.push(p);
+        p = p.left;
+      }
+      const node = stacks.pop();
+      res.push(node.val);
+      p = node.right;
+    }
+    return res;
+  }
+}
+const tree = new BinarySearchTree1()
 tree.insertNode([71, 35, 87, 22, 53, 46, 66, 78, 98])
-const arr = BinarySearchTree.inorder(tree.root)
-console.log(arr) // [ 22, 35, 46, 53, 66,71, 78, 87, 98 ]
+const arr = BinarySearchTree1.inorder(tree.root)
+console.log(2, arr) // [ 22, 35, 46, 53, 66,71, 78, 87, 98 ]

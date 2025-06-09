@@ -25,8 +25,8 @@ function deepCopy(obj, map = new WeakMap()) {
     return cloneObj;
 } 
 
-// const target = {a: 1, b: 2,c:{c1:3}, d: [2,3]};
-const target = {
+const target = {a: 1, b: 2,c:{c1:3}, d: [2,3]};
+const target1 = {
     field1: 1,
     field2: undefined,
     field3: {
@@ -34,7 +34,7 @@ const target = {
     },
     field4: [2, 4, 8]
 };
-target.target = target;
+// target.target = target;
 const copy1 = deepCopy(target);
 target.d = [2,3.4,5];
 console.log(copy1); 

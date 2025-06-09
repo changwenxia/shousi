@@ -1,16 +1,21 @@
 // 递归将数字翻转
 // console.log(fn(1234));
-function func(a){
-  let num1 = a/10
-  let num2 = a%10
-  console.log(num2);
-  if(num1<1){
-    return a
-  }else{
-    num1 = Math.floor(num1) 
-    return num2 = `${num2}${func(num1)}`   
+
+function reverseNumber(num) {
+  // 处理负数
+  const isNegative = num < 0;
+  num = Math.abs(num);
+  
+  const reverse = num => {
+    if (num < 10)  return num;
+    const num1 = num % 10;
+    const num2 = reverse(Math.floor(num / 10));
+    return Number(`${num1}${num2}`);
   }
+  const res = reverse(num);
+  return isNegative ? -res : res;
 }
-let aa = func(1234)
+
+let aa = reverseNumber(12340)
 console.log(aa);
 console.log(typeof aa);

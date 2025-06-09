@@ -166,11 +166,11 @@ let p1 = new MyPromise((resolve, reject) => {
    
 //   let p3 = MyPromise.reject('失败')
    
-MyPromise.all([p1, p2]).then((result) => {
-    console.log(result)               //['成功了', 'success']
-  }).catch((error) => {
-    console.log(error)
-  })
+// MyPromise.all([p1, p2]).then((result) => {
+//     console.log(result)               //['成功了', 'success']
+//   }).catch((error) => {
+//     console.log(error)
+//   })
   
 
 const p = new MyPromise((resolve, reject) => {

@@ -1,14 +1,20 @@
 // 版本比较1
 const comparseVersion = (sv1, sv2) => {
-    const [cur, tur] = [sv1.split('.'), sv2.split('.')];
-    const maxL = Math.max(cur.length, tur.length);
-    let res = 0;
+    if(!v1 || !v2) return 0;
+    const [v1Arr, v2Arr] = [v1.split('.').map(Number), v2.split('.').map(Number)];
+    const maxLen = Math.max(v1Arr.length, v2Arr.length);
+    v1Arr.length = v2Arr.length = maxLen;
 
-    Object.values(maxL).map(idx => {
-        const [cItem, turItem]= [cur[idx] || 0, tur[idx] || 0];
-        res = cItem > turItem ? 1 : -1;
-    })
-    return res;
+    for(let i = 0; i<maxLen; i++) {
+        const [v1Item, v2Item] = [v1Arr[i] || 0, v2Arr[i] || 0];
+        if (v1Item > v2Item) {
+            return 1;
+        }
+        if (v1Item < v2Item) {
+            return -1;
+        }
+    }
+    return 0;
 }
 
 // comparseVersion('1.0', '1.1');

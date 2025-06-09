@@ -88,13 +88,22 @@ function bouncer(arr) {
 // destroyer([3, 5, 1, 2, 2], 2, 3, 5) 应该返回 [1].
 // destroyer([2, 3, 2, 3], 2, 3) 应该返回 [].
 // destroyer(["tree", "hamburger", 53], "tree", 53) 应该返回["hamburger"].
-function destroyer(arr) {
-  return arr.filter(val => {
-    for (let i = 1; i < arguments.length; i++) {
-      if (arguments[i] === val) return false;
-    }
-    return true;
-  })
+function destroyer(arr, ...valuesToDestroy) {
+  // 解法1
+  // return arr.filter(val => {
+  //   for (let i = 1; i < arguments.length; i++) {
+  //     if (arguments[i] === val) return false;
+  //   }
+  //   return true;
+  // })
+  // 解法2
+  // let newArr = [];
+	// for (let i = 1; i < arguments.length; i++) {
+	// 	newArr.push(arguments[i]);
+	// }
+	// return arr.filter(item => newArr.indexOf(item) < 0);
+  // 解法3
+  return arr.filter(val => !valuesToDestroy.includes(val))
 }
 // 先给数组排序，然后找到指定的值在数组的位置，最后返回位置对应的索引。
 // 举例：where([1,2,3,4], 1.5) 应该返回1。因为1.5插入到数组[1,2,3,4]后变成[1,1.5,2,3,4]，而1.5对应的索引值就是1。
@@ -169,11 +178,27 @@ var getName = function () {  console.log(4);  };
 
 function getName() {  console.log(5); }
 
-//请写出以下输出结果：
-Foo.getName(); // 2
-getName();     //  4
-Foo().getName();  // 1
-getName();   // 1
-new Foo.getName(); //2
-new Foo().getName(); // 3
-new new Foo().getName(); // 3
+  //请写出以下输出结果：
+  foo.getName()//2
+  //foo是一个函数，也可以说是一个对象，所以它也可以挂载一些属性和方法，18行在其上挂载了一个getName方法
+  //执行的结果是2
+  
+  getName()//4
+  //21行有一个全局函数，全局函数声明提前后被20行的getName覆盖，所以输出4
+
+  foo().getName()//1
+  //foo()执行完成后，将全局的getName也就是window.getName给更改后返回this，而在这里this执行的就是window，所以最后执行的就是window.getName，所以输出1
+
+  getName()//1
+  //在上面已经更改全局的getName，所以依然是1
+
+  new foo.getName()//2
+  //new 操作符在实例化构造器的时候，会执行构造器函数，也就是说，foo.getName会执行，输出2
+
+  new foo().getName()//3
+  //new操作符的优先级较高，所以会先new foo()得到一个实例，然后再执行实例的getName方法,这个时候，实例的构造器里没有getName方法，就会执行构造器原型上的getName方法
+
+  new new foo().getName()//3
+  //先执行new foo()得到一个实例，然后在new 这个实例的getName方法,这个时候会执行这个方法，所以输出3
+
+  //除了本地对象的方法，其他的函数都能new

@@ -29,7 +29,7 @@ function runGenerator(gen) {
         const res3 = yield Promise.reject('error');
         console.log('res3', res3); // 3
       } catch (error) {
-        console.log(error)
+        console.log(11, error)
       }
   }
   

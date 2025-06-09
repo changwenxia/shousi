@@ -66,27 +66,6 @@ MyPromise.all = function(promiseArr) {
     })
 };
 
-function PromiseAll(promise) {
-    return new Promise((resolve, reject) => {
-      let index= 0;
-      let result = []
-      if(promise.length === 0) {
-          resolve(result)
-      } else {
-         for (let i = 0; i < promise.length; i++) {
-             Promise.resolve(promise[i]).then(data=> {
-                result[i] = data
-                if(++index === promise.length){
-                   resolve(result)
-                }
-             }, err=> {
-                reject(err)
-             })
-         }
-      }
-     })
-  }
-
 function PromiseAll(promiseArr) {
     return new Promise((resolve, reject) => {
         let index = 0;
@@ -316,7 +295,7 @@ function resolvePromise(promise2, x, resolve, reject) {
         
     // //   let p3 = MyPromise.reject('失败')
         
-    //   MyPromise.all([p1, p2]).then((result) => {
+    // MyPromise.all([p1, p2]).then((result) => {
     //     console.log(result)               //['成功了', 'success']
     //   }).catch((error) => {
     //     console.log(error)

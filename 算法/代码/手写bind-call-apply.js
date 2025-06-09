@@ -13,7 +13,7 @@ Function.prototype.bind = function (context, ...bindments) {
 function one(a, b) {
     this.a = a;
     this.b = b;
-    console.log(this)
+    // console.log(this)
   }
   var obj = {
     name: 'yiyi'
@@ -22,7 +22,7 @@ function one(a, b) {
   child(3);
   
   var two = new child(4);
-  console.log(two)
+//   console.log(two)
 // call
 Function.prototype.call = function (context, ...callargs) {
     context = context || window;
@@ -46,15 +46,15 @@ Function.prototype.apply = function (context, arr) {
     return res;
 };
 
-// var foo = {
-//     name: "Selina",
-// };
-// var name = "Chirs";
+var foo = {
+    name: "Selina",
+};
+var name = "Chirs";
 
-// function bar(job, age) {
-//     console.log(this.name);
-//     console.log(job, age);
-// }
-// bar.call(foo, "programmer", 20);
+function bar(job, age) {
+    console.log(this.name);
+    console.log(job, age);
+}
+bar.call(foo, "programmer", 20);
 // bar.apply(null, ["teacher", 25]);
 

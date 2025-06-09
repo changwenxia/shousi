@@ -26,10 +26,9 @@
     const arr2 = [{age: 55}, {age: 22}, {age: 11}, {age: 66}, {age: 33}]
     // 数组arr2中每项都是一个对象，对象中age属性 === 数组arr1中的项
     // 将arr2数组根据对象的age值在arr1中的位置排序， 排序后的结果为 `const arr2 = [ {age: 33}，{age: 11}, {age: 55}, {age: 22}, {age: 66}]
-    function sort1(name, arr) {
-      return (prev, next) => {
-        return arr.indexOf(prev[name]) - arr.indexOf(next[name])
-      }
+
+    function sort2(name, arr) {
+      return (prev, next) => arr.indexOf(prev[name]) - arr.indexOf(next[name])
     }
    
     const arr = [33, 11, 55, 22, 66]
@@ -49,5 +48,5 @@
       age: 33,
       money: 5000
     }]
-    obj.sort(sort1("age", arr))
+    obj.sort(sort2("age", arr))
     console.log(obj);

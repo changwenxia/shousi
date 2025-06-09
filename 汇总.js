@@ -66,17 +66,17 @@
 
 
 // 递归将数字翻转
-// function revertNumber(a) {
-//     let num1 = a/10;
-//     let num2 = a%10;
-//     console.log(a, num1, num2);
+function revertNumber(a) {
+    let num1 = a/10;
+    let num2 = a%10;
+    console.log(a, num1, num2);
 
-//     if (num1 < 1) {
-//         return a;
-//     }
-//     num1 = Math.floor(num1);
-//     return `${num2}${revertNumber(num1)}`;
-// }
+    if (num1 < 1) {
+        return a;
+    }
+    num1 = Math.floor(num1);
+    return `${num2}${revertNumber(num1)}`;
+}
 
 // let a = revertNumber(1234);
 // console.log(a, typeof a);
@@ -1089,20 +1089,27 @@ function shellSort1(nums) {
   }
 // 6.桶排序
 // 取 n 个桶，根据数组的最大值和最小值确认每个桶存放的数的区间，将数组元素插入到相应的桶里，最后再合并各个桶。
-function bucketSort(arr) {
-    let data = Array.from({length: 10}).fill(0);
-    let newArr = [];
-    arr.forEach(el => {
-        data[el] !== 'undefined' ? data[el]++ : data[el] = 1;
-    });
+function bucketSort(arr, bucketSize = 10) {
+	if (arr.length === 0) return arr;
+  
+	// 1. 找到最大值和最小值
+	let min = Math.min(...arr), max = Math.max(...arr);
+  
+	// 2. 初始化桶
+	const bucketCount = Math.floor((max - min) / bucketSize) + 1;
+	const buckets = Array(bucketCount).fill().map(() => []);
+	// 3. 分配元素到桶
+	for (let num of arr) {
+	  const bucketIdx = Math.floor((num - min) / bucketSize);
+	  buckets[bucketIdx].push(num);
+	}
+  
+	// 4. 对每个桶排序并合并
+	return buckets.reduce((sorted, bucket) => {
+	  return sorted.concat(bucket.sort((a, b) => a - b));
+	}, []);
+  }
 
-    for(let i=0;i<data.length;i++) {
-        for(let j=0;j<data[i];j++) {
-            newArr.push(i);
-        }
-    }
-    return newArr;
-}
 // 7.计数排序
 // 找出待排序的数组中最大和最小的元素；
 // 统计数组中每个值为i的元素出现的次数，存入数组C的第i项；
